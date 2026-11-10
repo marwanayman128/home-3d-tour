@@ -964,7 +964,7 @@ function peerSet(id, d) {
 function peerDrop(id) { const p = peers.get(id); if (!p) return; scene.remove(p.grp); peers.delete(id); sys(p.name + (p.g === 'f' ? ' خرجت' : ' خرج')); refreshNet(); }
 function refreshNet() {
   const names = [...peers.values()].map(p => p.name);
-  netEl.textContent = (online ? 'أونلاين' : 'أوفلاين') + ' — ' + (names.length ? 'معاك: ' + names.join('، ') : 'لوحدك دلوقتي');
+  netEl.textContent = (ME.name ? 'أنت: ' + ME.name + ' — ' : '') + (online ? 'أونلاين' : 'أوفلاين') + ' — ' + (names.length ? 'معاك: ' + names.join('، ') : 'لوحدك دلوقتي');
   netEl.style.color = online ? '#9ff0b0' : '#ffb0a0';
 }
 function addLine(who, msg, cls) {
@@ -990,6 +990,7 @@ function onMsg(topic, payload) {
   else if (k === 'c') { const p = peers.get(d.i), m = String(d.m || '').slice(0, 200); if (!m) return; addLine(p ? p.name : String(d.n || '؟').slice(0, 20), m);
     if (p) { if (p.bubble) p.grp.remove(p.bubble); p.bubble = labelSprite(m.length > 26 ? m.slice(0, 25) + '…' : m, 'rgba(255,255,255,0.92)', '#111'); p.bubble.position.y = 2.22; p.grp.add(p.bubble); p.bt = 6; } }
   else if (k === 'bye') peerDrop(d.i);
+  else if (k === 'hi') lastHb = 0;   // حد لسه داخل — ابعتله مكاني فوراً
 }
 function netStart() {
   if (!window.mqtt) { refreshNet(); return; }
@@ -998,7 +999,7 @@ function netStart() {
     let ok = false;
     const c = window.mqtt.connect(urls[i], { clientId: 'apt_' + ME.id + '_' + i, keepalive: 30, reconnectPeriod: 0, connectTimeout: 8000, clean: true,
       will: { topic: BASE + '/bye', payload: JSON.stringify({ i: ME.id }), qos: 0, retain: false } });
-    c.on('connect', () => { ok = true; mq = c; online = true; c.options.reconnectPeriod = 3000; c.subscribe(BASE + '/#'); lastHb = 0; refreshNet(); });
+    c.on('connect', () => { ok = true; mq = c; online = true; c.options.reconnectPeriod = 3000; c.subscribe(BASE + '/#', () => pub('hi', { i: ME.id })); lastHb = 0; refreshNet(); });
     c.on('message', onMsg); c.on('error', () => {});
     c.on('close', () => { online = false; refreshNet(); if (!ok) { try { c.end(true); } catch (e) {} if (++i < urls.length) tryOne(); } });
   };
@@ -1008,12 +1009,15 @@ function netStart() {
 function netTick(dt) {
   const now = performance.now();
   for (const [id, p] of peers) {
-    if (now - p.last > 9000) { peerDrop(id); continue; }
+    if (now - p.last > 12000) { peerDrop(id); continue; }
     const k = Math.min(1, dt * 9); p.x += (p.tx - p.x) * k; p.z += (p.tz - p.z) * k;
     let dy = p.tyaw - p.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); p.yaw += dy * k;
     p.grp.position.set(p.x, 0, p.z); p.grp.rotation.y = p.yaw;
     if (p.bubble && (p.bt -= dt) <= 0) { p.grp.remove(p.bubble); p.bubble = null; }
   }
+}
+function netSend() {
+  const now = performance.now();
   if (!online || !ME.name) return;
   const pos = pl.x.toFixed(2) + ',' + pl.z.toFixed(2) + ',' + pl.yaw.toFixed(2), hb = now - lastHb > 1000;
   if ((pos !== lastPos && now - lastSend > 90) || hb) {
@@ -1022,6 +1026,9 @@ function netTick(dt) {
     pub('s', o); lastSend = now; lastPos = pos;
   }
 }
+// نبض الإرسال من Worker عشان يفضل شغال حتى لو التاب/الشباك في الخلفية
+try { const w = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},100)'], { type: 'text/javascript' }))); w.onmessage = netSend; }
+catch (e) { setInterval(netSend, 100); }
 // ---- الشات
 function chatOpen() { chatIn.style.display = 'block'; chatIn.focus(); for (const k in keys) keys[k] = false; }
 chatIn.addEventListener('keydown', e => {
@@ -1101,7 +1108,7 @@ function tick() {
 }
 tick();
 // للتجربة من الكونسول
-window.__apt = { netTick, peers, ME, pl, R, colliders, interact, scene, camera, renderer, step, THREE, frame: () => { step(0.001); hudT = 1; hud(0); renderer.render(scene, camera); } };
+window.__apt = { peers, ME, pl, R, colliders, interact, scene, camera, renderer, step, THREE, frame: () => { step(0.001); hudT = 1; hud(0); renderer.render(scene, camera); } };
 </script>
 </body>
 </html>
