@@ -85,14 +85,14 @@ const K = Math.min(1.3, Math.max(0.8, parseFloat(new URLSearchParams(location.se
 
 const R = {
   rec:    { x0:10.31, z0:0.03, x1:16.08, z1:6.43, name:'الريسبشن',            dims:'5.77 × 6.40' },
-  kit:    { x0: 7.76, z0:0.03, x1:10.16, z1:3.05, name:'المطبخ',              dims:'2.40 × 3.02' },
-  bath:   { x0: 4.76, z0:1.22, x1: 7.61, z1:3.05, name:'الحمام',              dims:'2.85 × 1.83' },
+  kit:    { x0: 6.81, z0:0.03, x1:10.16, z1:3.05, name:'المطبخ',              dims:'3.35 × 3.02 (من عدّ البلاط في الصور — البلوبرنت 2.40 × 3.02)' },
+  bath:   { x0: 3.81, z0:1.22, x1: 6.66, z1:3.05, name:'الحمام',              dims:'2.85 × 1.83' },
   corr:   { x0: 3.95, z0:3.20, x1:10.31, z1:4.20, name:'الطرقة',              dims:'5.57 × 1.00' },
   master: { x0:-0.10, z0:3.20, x1: 3.80, z1:7.30, name:'الماستر',             dims:'≈ 3.90 × 4.10 (تقديري — البلوبرنت 3.60 × 3.80)' },
   bed:    { x0: 3.95, z0:4.35, x1: 6.98, z1:7.77, name:'أوضة النوم',          dims:'3.03 × 3.42' },
   office: { x0: 7.13, z0:4.35, x1:10.16, z1:7.77, name:'الأوفيس',             dims:'3.03 × 3.42' },
   terr:   { x0:10.31, z0:6.58, x1:13.91, z1:7.73, name:'التراس',              dims:'3.60 × 1.15' },
-  serv:   { x0: 6.41, z0:0.03, x1: 7.61, z1:1.07, name:'بلكونة المطبخ',       dims:'≈ 1.20 × 1.04 (تقريبي)' },
+  serv:   { x0: 5.46, z0:0.03, x1: 6.66, z1:1.07, name:'بلكونة المطبخ',       dims:'≈ 1.20 × 1.04 (تقريبي)' },
   land:   { x0:12.00, z0:-2.60, x1:16.28, z1:-0.17, name:'بسطة السلم (برا)',  dims:'—' },
 };
 
@@ -195,7 +195,7 @@ const T_bfloor = tex(256, 256, (g, w, h) => {
   for (const p of [0, 128, 256]) { g.beginPath(); g.moveTo(p, 0); g.lineTo(p, h); g.stroke(); g.beginPath(); g.moveTo(0, p); g.lineTo(w, p); g.stroke(); }
 });
 // حيطة المطبخ: سيراميك بيج 60×30 + باند الديكور (التكستشر 1.2م عرض × ارتفاع السقف)
-const KPX = 400, BAND0 = 0.94, BAND1 = 1.42;
+const KPX = 400, BAND0 = 0.90, BAND1 = 1.50;   // الباند = صفّين بلاط (الصف الرابع والخامس من تحت)
 const T_kwall = tex(480, Math.round(H * KPX), (g, w, h) => {
   const Y = y => h - y * KPX;
   g.fillStyle = '#d9c4a1'; g.fillRect(0, 0, w, h);
@@ -205,8 +205,9 @@ const T_kwall = tex(480, Math.round(H * KPX), (g, w, h) => {
   for (const x of [0, 240, 480]) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
   // الباند: 4 صفوف × 12سم
   const cs = 48, pal = ['#b5533c', '#a23b36', '#3c4a5e', '#8c7a66', '#c79a4b', '#6f7f6a', '#c98a7a'];
-  for (let r = 0; r < 4; r++) for (let c = 0; c < 10; c++) {
-    const x = c * cs, y = Y(BAND1) + r * cs, cx = x + cs / 2, cy = y + cs / 2;
+  const G0 = g, bc = document.createElement('canvas'); bc.width = 384; bc.height = 192; g = bc.getContext('2d');   // 8 نقشات × 4 صفوف (15سم) وبعدين تتكبر على الباند
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 8; c++) {
+    const x = c * cs, y = r * cs, cx = x + cs / 2, cy = y + cs / 2;
     g.fillStyle = ['#eadfc8', '#e4d6ba', '#efe6d2', '#e0cfb0'][(rnd() * 4) | 0]; g.fillRect(x, y, cs, cs);
     const c1 = pal[(rnd() * pal.length) | 0], c2 = pal[(rnd() * pal.length) | 0], k = (rnd() * 6) | 0;
     g.strokeStyle = c1; g.fillStyle = c2; g.lineWidth = 2;
@@ -218,7 +219,9 @@ const T_kwall = tex(480, Math.round(H * KPX), (g, w, h) => {
     else { for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) if ((i + j) % 2) g.fillRect(x + 4 + i * 10, y + 4 + j * 10, 10, 10); g.strokeRect(x + 4, y + 4, cs - 8, cs - 8); }
     g.strokeStyle = '#d8c9ab'; g.lineWidth = 1; g.strokeRect(x, y, cs, cs);
   }
-  g.fillStyle = 'rgba(226,212,184,0.30)'; g.fillRect(0, Y(BAND1), w, 4 * cs);   // تهدية ألوان الباند
+  g.fillStyle = 'rgba(226,212,184,0.30)'; g.fillRect(0, 0, 384, 192);   // تهدية ألوان الباند
+  G0.drawImage(bc, 0, Y(BAND1), w, (BAND1 - BAND0) * KPX); g = G0;
+  g.strokeStyle = '#ece2cf'; g.lineWidth = 2; for (const yy of [BAND0, (BAND0 + BAND1) / 2, BAND1]) { g.beginPath(); g.moveTo(0, Y(yy)); g.lineTo(w, Y(yy)); g.stroke(); }
 });
 // حيطة الحمام: سيراميك بيج-رمادي 30×60 رأسي (0.6 × 1.2)
 const T_bwall = tex(256, 512, (g, w, h) => {
@@ -295,7 +298,7 @@ const T_bfloorB = gridBump(256, 256, [0, 128, 256], [0, 128, 256], 3, 200);
 const T_bwallB = gridBump(256, 512, [0, 128, 256], [0, 256, 512], 3, 0);
 const T_mandalaB = gridBump(384, 384, [0, 192, 384], [0, 384], 3, 0);
 const T_kwallB = (() => { const hpx = Math.round(H * KPX), ys = []; for (let y = 0; y <= H + 0.01; y += 0.30) ys.push(hpx - y * KPX);
-  for (let r = 0; r <= 4; r++) ys.push(hpx - BAND1 * KPX + r * 48);
+  for (let r = 0; r <= 4; r++) ys.push(hpx - BAND1 * KPX + r * 60);
   return gridBump(480, hpx, [0, 240, 480], ys, 3, 0); })();
 const T_woodB = tex(2048, 512, (g, w, h) => { const rows = 6, rh = h / rows; g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
   for (let i = 0; i < 900; i++) { g.strokeStyle = rnd() > 0.5 ? '#000' : '#fff'; g.globalAlpha = 0.04 + rnd() * 0.07; g.lineWidth = 0.6 + rnd() * 1.6; const y = rnd() * h, x = rnd() * w, len = 60 + rnd() * 400; g.beginPath(); g.moveTo(x, y); g.lineTo(x + len, y + (rnd() - .5) * 3); g.stroke(); }
@@ -586,7 +589,7 @@ function setLamp(l, on) { l.on = on; l.L.intensity = on ? l.I : 0; l.glass.mater
 floor(R.rec.x0, R.rec.z0, R.rec.x1, R.rec.z1, M.porc, 1.2, 1.2);
 floor(R.corr.x0, R.corr.z0, R.corr.x1, R.corr.z1, M.porc, 1.2, 1.2);
 floor(R.terr.x0, R.terr.z0, R.terr.x1, R.terr.z1 + 0.12, M.porc, 1.2, 1.2);
-floor(R.kit.x0, R.kit.z0, R.kit.x1, R.kit.z1, M.kfloor, 0.9, 0.9);
+floor(R.kit.x0, R.kit.z0, R.kit.x1, R.kit.z1, M.kfloor, 0.8, 0.8);
 floor(R.serv.x0 - 0.12, R.serv.z0 - 0.12, R.serv.x1, R.serv.z1, M.kfloor, 0.8, 0.8);
 floor(R.bath.x0, R.bath.z0, R.bath.x1, R.bath.z1, M.bfloor, 1.2, 1.2);
 for (const k of ['master', 'bed', 'office']) floor(R[k].x0, R[k].z0, R[k].x1, R[k].z1, M.wood, 2.4, 1.2, k !== 'master');   // الماستر: الألواح بالعرض (شرق-غرب)
@@ -602,7 +605,7 @@ ceiling(R.serv.x0 - 0.12, R.serv.z0 - 0.12, R.serv.x1, R.serv.z1);
 const D = { // فتحات الأبواب (rough opening)
   entrance: { a: 14.88, b: 15.93 },   // باب الشقة — حيطة الريسبشن الشمالية
   kitchen:  { a:  9.28, b: 10.08 },   // حيطة الطرقة الشمالية
-  bath:     { a:  5.66, b:  6.46 },
+  bath:     { a:  4.71, b:  5.51 },
   bed:      { a:  5.98, b:  6.88 },   // حيطة الطرقة الجنوبية
   office:   { a:  7.23, b:  8.13 },
   master:   { a: 3.225, b: 4.175 },   // حيطة الماستر الشرقية (z)
@@ -619,15 +622,15 @@ const WIN = {
 };
 const dop = (d, h = DH) => ({ a: d.a, b: d.b, y0: 0, y1: h });
 
-wall('x', 7.61, 16.28, -0.17, 0.03, [dop(D.entrance)]);                                   // شمال (مطبخ + ريسبشن)
+wall('x', 6.66, 16.28, -0.17, 0.03, [dop(D.entrance)]);                                   // شمال (مطبخ + ريسبشن)
 wall('z', 0.03, 6.43, 16.08, 16.28);                                                       // شرق الريسبشن
 wall('x', 10.31, 16.28, 6.43, 6.58, [dop(D.terrace), WIN.rec]);                            // جنوب الريسبشن
 wall('z', 0.03, 7.97, 10.16, 10.31, [{ a: D.mouth.a, b: D.mouth.b, y0: 0, y1: 2.25 }]);    // غرب الريسبشن / شرق المطبخ والأوفيس
-wall('z', 0.03, 3.05, 7.61, 7.76, [dop(D.service, 2.10)]);                                 // غرب المطبخ / شرق الحمام
-wall('x', 3.95, 10.16, 3.05, 3.20, [dop(D.bath), dop(D.kitchen)]);                         // شمال الطرقة
-wall('x', 4.61, 7.61, 1.07, 1.22);                                                         // شمال الحمام
-wall('z', 1.22, 3.05, 4.61, 4.76, [WIN.bath]);                                             // غرب الحمام
-wall('x', -0.30, 3.95, 3.00, 3.20);                                                         // شمال الماستر
+wall('z', 0.03, 3.05, 6.66, 6.81, [dop(D.service, 2.10)]);                                 // غرب المطبخ / شرق الحمام
+wall('x', 3.66, 10.16, 3.05, 3.20, [dop(D.bath), dop(D.kitchen)]);                         // شمال الطرقة
+wall('x', 3.66, 6.66, 1.07, 1.22);                                                         // شمال الحمام
+wall('z', 1.22, 3.05, 3.66, 3.81, [WIN.bath]);                                             // غرب الحمام
+wall('x', -0.30, 3.66, 3.00, 3.20);                                                         // شمال الماستر
 wall('z', 3.20, 7.97, 3.80, 3.95, [dop(D.master)]);                                        // شرق الماستر / غرب أوضة النوم
 wall('z', 3.20, 7.30, -0.30, -0.10);                                                         // غرب الماستر
 wall('x', -0.30, 3.80, 7.30, 7.50, [WIN.master]);                                           // جنوب الماستر
@@ -639,8 +642,8 @@ solid(10.31, 13.91, 0, 1.00, 7.73, 7.85, M.paint);                              
 B(10.31, 13.91, 1.00, 1.04, 7.71, 7.87, M.corn);
 { const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 3.6, 12), M.steel); rail.rotation.z = Math.PI / 2; rail.position.set(12.11, 1.14, 7.79); scene.add(rail);   // درابزين التراس
   for (const px of [10.40, 11.25, 12.11, 12.97, 13.82]) B(px - 0.012, px + 0.012, 1.04, 1.13, 7.778, 7.802, M.steel); }
-solid(6.29, 6.41, 0, 1.10, -0.09, 1.07, M.paint); solid(6.41, 7.61, 0, 1.10, -0.09, 0.03, M.paint); // سور بلكونة المطبخ
-B(6.27, 6.43, 1.10, 1.14, -0.11, 1.07, M.corn); B(6.43, 7.61, 1.10, 1.14, -0.11, 0.05, M.corn);
+solid(5.34, 5.46, 0, 1.10, -0.09, 1.07, M.paint); solid(5.46, 6.66, 0, 1.10, -0.09, 0.03, M.paint); // سور بلكونة المطبخ
+B(5.32, 5.48, 1.10, 1.14, -0.11, 1.07, M.corn); B(5.48, 6.66, 1.10, 1.14, -0.11, 0.05, M.corn);
 // بسطة السلم برا
 wall('z', -2.75, -0.17, 11.85, 12.00, [], M.landWall); wall('x', 11.85, 16.43, -2.75, -2.60, [], M.landWall); wall('z', -2.60, -0.17, 16.28, 16.43, [], M.landWall);
 { // الأسانسير قصاد باب الشقة + شباك السلم
@@ -677,13 +680,13 @@ column(-0.10, 0.02, 3.20, 3.56, M.skWood);                           // الما
   face('E', k.x0, k.z0, k.z1, [sd], M.kwall, 1.2, H);
   trims(k, {});
 }
-{ const b = R.bath, bd = dop(D.bath), SX = 6.71, SZ = 1.85;   // SX,SZ = ركن كابينة الدُش
+{ const b = R.bath, bd = dop(D.bath), SX = 5.76, SZ = 1.85;   // SX,SZ = ركن كابينة الدُش
   face('S', b.z0, b.x0, b.x1, [], M.bwall, 0.6, 1.2);
   face('W', b.x1, b.z0, SZ, [], M.bwall, 0.6, 1.2); face('W', b.x1, SZ, b.z1, [], M.mandala, 0.6, 0.6);
   face('N', b.z1, b.x0, SX, [bd], M.bwall, 0.6, 1.2); face('N', b.z1, SX, b.x1, [], M.mandala, 0.6, 0.6);
   face('E', b.x0, b.z0, b.z1, [WIN.bath], M.bwall, 0.6, 1.2);
-  solid(4.76, 4.91, 0, H, 1.22, 1.57, M.paint);            // عمود شمال غرب
-  face('E', 4.91, 1.22, 1.57, [], M.bwall, 0.6, 1.2); face('S', 1.57, 4.76, 4.91, [], M.bwall, 0.6, 1.2);
+  solid(3.81, 3.96, 0, H, 1.22, 1.57, M.paint);            // عمود شمال غرب
+  face('E', 3.96, 1.22, 1.57, [], M.bwall, 0.6, 1.2); face('S', 1.57, 3.81, 3.96, [], M.bwall, 0.6, 1.2);
   trims(b, {});
 }
 
@@ -708,7 +711,7 @@ door({ wall: 'x', ...D.bath,     c0: 3.05, c1: 3.20, hinge: 'a', swing: -1, kind
 door({ wall: 'x', ...D.bed,      c0: 4.20, c1: 4.35, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 88,  label: 'باب أوضة النوم' });
 door({ wall: 'x', ...D.office,   c0: 4.20, c1: 4.35, hinge: 'a', swing: +1, kind: 'wood', open: true, deg: 88,  label: 'باب الأوفيس' });
 door({ wall: 'z', ...D.master,   c0: 3.80, c1: 3.95, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 88,  label: 'باب الماستر' });
-door({ wall: 'z', ...D.service,  c0: 7.61, c1: 7.76, hinge: 'a', swing: -1, kind: 'service', open: false, deg: 95, h: 2.10, label: 'باب بلكونة المطبخ', sill: M.kfloor });
+door({ wall: 'z', ...D.service,  c0: 6.66, c1: 6.81, hinge: 'a', swing: -1, kind: 'service', open: false, deg: 95, h: 2.10, label: 'باب بلكونة المطبخ', sill: M.kfloor });
 door({ wall: 'x', ...D.terrace,  c0: 6.43, c1: 6.58, double: true, swing: +1, kind: 'terrace', open: true, deg: 92, label: 'باب التراس' });
 
 /* =====================================================================
@@ -718,7 +721,7 @@ windowUnit('x', WIN.rec.a, WIN.rec.b, 6.43, 6.58, WIN.rec.y0, WIN.rec.y1, 'rec')
 windowUnit('x', WIN.master.a, WIN.master.b, 7.30, 7.50, WIN.master.y0, WIN.master.y1, 'double');
 windowUnit('x', WIN.bed.a, WIN.bed.b, 7.77, 7.97, WIN.bed.y0, WIN.bed.y1, 'double');
 windowUnit('x', WIN.office.a, WIN.office.b, 7.77, 7.97, WIN.office.y0, WIN.office.y1, 'double');
-windowUnit('z', WIN.bath.a, WIN.bath.b, 4.61, 4.76, WIN.bath.y0, WIN.bath.y1, 'bath');
+windowUnit('z', WIN.bath.a, WIN.bath.b, 3.66, 3.81, WIN.bath.y0, WIN.bath.y1, 'bath');
 
 /* =====================================================================
    لوحة الكهرباء الرئيسية (الريسبشن — الحيطة الشرقية جنب باب الشقة)
@@ -783,10 +786,10 @@ plate('W', 10.16, 7.2, 0.35); plate('W', 10.16, 7.33, 0.35); plate('W', 10.16, 5
 // المطبخ (جوه الباند)
 plate('W', 10.16 - EPS, 0.88, 1.12); plate('W', 10.16 - EPS, 2.03, 1.18);
 plate('N', 3.05 - EPS, 8.87, 1.16, 'sw', 2); plate('N', 3.05 - EPS, 8.47, 1.18);
-plate('S', 0.03 + EPS, 8.20, 1.95);
+plate('S', 0.03 + EPS, 7.25, 1.95);
 // الحمام
-plate('S', 1.22 + EPS, 5.52, 1.28); plate('S', 1.22 + EPS, 6.19, 1.22, 'sw', 3); plate('S', 1.22 + EPS, 7.15, 1.90);
-plate('E', 4.76 + EPS, 2.62, 1.55, 'sw', 2); plate('E', 4.76 + EPS, 2.64, 0.72); plate('W', 7.61 - EPS, 1.50, 1.60, 'sw', 1);
+plate('S', 1.22 + EPS, 4.57, 1.28); plate('S', 1.22 + EPS, 5.24, 1.22, 'sw', 3); plate('S', 1.22 + EPS, 6.20, 1.90);
+plate('E', 3.81 + EPS, 2.62, 1.55, 'sw', 2); plate('E', 3.81 + EPS, 2.64, 0.72); plate('W', 6.66 - EPS, 1.50, 1.60, 'sw', 1);
 // الطرقة
 plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
 
@@ -809,7 +812,7 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
   const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.06, 10), M.chrome); sp.position.set(x0 + 0.155, 1.09, z0 + 0.26); scene.add(sp);
   const kn = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.03, 10), M.chrome); kn.position.set(x0 + 0.03, 1.15, z0 + 0.26); scene.add(kn);
   colliders.push({ x0: R.kit.x0, x1: R.kit.x0 + d, z0, z1 });
-  const hook = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.07, 6), M.dark); hook.rotation.x = Math.PI / 2; hook.position.set(8.2, 2.2, 0.03 + 0.035); scene.add(hook);
+  const hook = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.07, 6), M.dark); hook.rotation.x = Math.PI / 2; hook.position.set(7.25, 2.2, 0.03 + 0.035); scene.add(hook);
   { const v1 = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.05, 10), M.chrome); v1.rotation.z = Math.PI / 2; v1.position.set(x0 + 0.025, 0.40, 0.89); scene.add(v1);
     const v2 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.014, 12), M.chrome); v2.rotation.z = Math.PI / 2; v2.position.set(x0 + 0.055, 0.40, 0.89); scene.add(v2); }   // محبس جنب باب البلكونة
 }
@@ -821,17 +824,17 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
   const zN = R.bath.z0 + EPS;
   const cyl = (r, len, mat, x, y, z, ax = 'y', r2 = r) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r2, len, 14), mat); if (ax === 'x') m.rotation.z = Math.PI / 2; if (ax === 'z') m.rotation.x = Math.PI / 2; m.position.set(x, y, z); scene.add(m); return m; };
   // ---- القاعدة (على الحيطة الشمالية جنب العمود)
-  const tx = 5.20;
+  const tx = 4.25;
   B(tx - 0.19, tx + 0.19, 0.40, 0.80, zN, zN + 0.19, M.white);                      // الخزان
   B(tx - 0.20, tx + 0.20, 0.80, 0.83, zN - 0.001, zN + 0.20, M.white);
   cyl(0.022, 0.012, M.chrome, tx, 0.836, zN + 0.10);                                 // زرار السيفون
   B(tx - 0.17, tx + 0.17, 0.0, 0.40, zN + 0.10, zN + 0.62, M.white);                // جسم القاعدة
   B(tx - 0.185, tx + 0.185, 0.40, 0.445, zN + 0.17, zN + 0.66, M.white);            // الغطا
   colliders.push({ x0: tx - 0.2, x1: tx + 0.2, z0: R.bath.z0, z1: R.bath.z0 + 0.66 });
-  B(4.925, 5.05, 0.93, 1.05, zN, zN + 0.075, M.white);                               // علبة المناديل
+  B(3.975, 4.10, 0.93, 1.05, zN, zN + 0.075, M.white);                               // علبة المناديل
   cyl(0.012, 0.05, M.chrome, tx + 0.26, 0.22, zN + 0.025, 'z'); cyl(0.016, 0.03, M.chrome, tx + 0.26, 0.22, zN + 0.055, 'x');   // محبس القاعدة
   // ---- الحوض بعمود
-  const sx = 5.90;
+  const sx = 4.95;
   cyl(0.085, 0.70, M.white, sx, 0.35, zN + 0.20, 'y', 0.105);
   const basin = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.2, 0.17, 28), M.white); basin.scale.set(1, 1, 0.82); basin.position.set(sx, 0.775, zN + 0.22); scene.add(basin);
   B(sx - 0.27, sx + 0.27, 0.69, 0.86, zN, zN + 0.22, M.white);
@@ -849,16 +852,16 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
   const sc = cyl(0.036, 0.11, M.bulbOn.clone(), sx - 0.02, 1.93, zN + 0.085);
   const scL = new THREE.PointLight(0xfff6e8, 0.45, 4, 1.8); scL.position.set(sx, 2.0, zN + 0.45); scene.add(scL); lamps.push({ L: scL, glass: sc, I: 0.45, on: true, room: 'bath' });
   // محبسين الحيطة + اللي الكروم + ذراع الفوط (بين الحوض والكابينة)
-  for (const vx of [6.42, 6.50]) { cyl(0.022, 0.012, M.chrome, vx, 1.30, zN + 0.006, 'z'); cyl(0.011, 0.045, M.chrome, vx, 1.30, zN + 0.03, 'z'); cyl(0.016, 0.02, M.chrome, vx, 1.30, zN + 0.06, 'z'); }
-  const loop = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.006, 8, 20, Math.PI), M.chrome); loop.position.set(6.46, 1.33, zN + 0.045); scene.add(loop);
-  cyl(0.011, 0.36, M.white, 6.50, 1.12, zN + 0.06, 'x');
-  for (const ex of [6.32, 6.68]) B(ex - 0.02, ex + 0.02, 1.10, 1.14, zN, zN + 0.075, M.white);
-  cyl(0.06, 0.006, M.steel, 5.52, 0.003, 2.15); cyl(0.045, 0.008, M.dark, 5.52, 0.003, 2.15);   // بلاعة الأرضية
+  for (const vx of [5.47, 5.55]) { cyl(0.022, 0.012, M.chrome, vx, 1.30, zN + 0.006, 'z'); cyl(0.011, 0.045, M.chrome, vx, 1.30, zN + 0.03, 'z'); cyl(0.016, 0.02, M.chrome, vx, 1.30, zN + 0.06, 'z'); }
+  const loop = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.006, 8, 20, Math.PI), M.chrome); loop.position.set(5.51, 1.33, zN + 0.045); scene.add(loop);
+  cyl(0.011, 0.36, M.white, 5.55, 1.12, zN + 0.06, 'x');
+  for (const ex of [5.37, 5.73]) B(ex - 0.02, ex + 0.02, 1.10, 1.14, zN, zN + 0.075, M.white);
+  cyl(0.06, 0.006, M.steel, 4.57, 0.003, 2.15); cyl(0.045, 0.008, M.dark, 4.57, 0.003, 2.15);   // بلاعة الأرضية
   for (const zz of [2.55, 2.68]) cyl(0.02, 0.03, M.dark, R.bath.x0 + 0.015, 0.36, zz, 'x');     // مخارج الغسالة
   cyl(0.028, 0.03, M.dark, R.bath.x0 + 0.015, 0.30, 2.615, 'x');
 
   // ---- كابينة الدُش: ركن جنوب شرق — 0.90 × 1.20 — وش منزلق ناحية الغرب + جنب ثابت ناحية الشمال
-  const SX = 6.71, SZ = 1.85, x1 = R.bath.x1, z1 = R.bath.z1, top = 1.90, CB = 0.09;
+  const SX = 5.76, SZ = 1.85, x1 = R.bath.x1, z1 = R.bath.z1, top = 1.90, CB = 0.09;
   const curbM = S({ color: 0x96938c, roughness: 0.75 });
   B(SX, SX + 0.08, 0, CB, SZ, z1, curbM); B(SX + 0.08, x1, 0, CB, SZ, SZ + 0.08, curbM);        // العتبة (حرف L)
   floor(SX + 0.08, SZ + 0.08, x1, z1, M.pebble, 0.5, 0.5, false, 0.03);                           // أرضية الدُش
@@ -905,8 +908,8 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
    ===================================================================== */
 bulb(12.3, 2.40); bulb(13.0, 4.70);                      // الريسبشن (أماكن تقريبية)
 bulb(5.6, 3.70, 1.8); bulb(8.6, 3.70, 1.8);                  // الطرقة (تقريبي)
-bulb(8.96, 1.54, 2.6);                                   // المطبخ
-bulb(5.75, 2.20, 1.8);                                     // الحمام
+bulb(8.48, 1.54, 2.8);                                   // المطبخ
+bulb(4.80, 2.20, 1.8);                                     // الحمام
 bulb(1.85, 4.55); bulb(1.85, 6.15);                        // الماستر
 bulb(5.47, 5.35); bulb(5.47, 6.75);                      // أوضة النوم
 bulb(8.65, 5.35); bulb(8.65, 6.75);                      // الأوفيس
@@ -934,7 +937,7 @@ renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadow
 /* =====================================================================
    توسيع المسقط (K) + مفاتيح نور الأوض
    ===================================================================== */
-const switches = [['rec', 14.56, 0.25, 'الريسبشن'], ['master', 3.62, 4.53, 'الماستر'], ['bed', 5.72, 4.55, 'أوضة النوم'], ['office', 8.50, 4.55, 'الأوفيس'], ['kit', 8.87, 2.85, 'المطبخ'], ['bath', 4.95, 2.62, 'الحمام'], ['corr', 9.2, 4.0, 'الطرقة']]
+const switches = [['rec', 14.56, 0.25, 'الريسبشن'], ['master', 3.62, 4.53, 'الماستر'], ['bed', 5.72, 4.55, 'أوضة النوم'], ['office', 8.50, 4.55, 'الأوفيس'], ['kit', 8.87, 2.85, 'المطبخ'], ['bath', 4.00, 2.62, 'الحمام'], ['corr', 9.2, 4.0, 'الطرقة']]
   .map(([room, x, z, n]) => ({ room, x: x * K, z: z * K, label: 'مفتاح نور ' + n, light: room }));
 {
   const world = new THREE.Group(); world.scale.set(K, 1, K);
