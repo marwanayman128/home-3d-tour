@@ -38,6 +38,11 @@
   .touch #tbtn{display:flex} .touch #help{display:none} .touch #hint{bottom:30%}
   @media (max-width:700px){ #map{width:150px;height:100px} #hud{font-size:12px;padding:7px 10px;min-width:0;line-height:1.55} #hud b{font-size:14px} #help{display:none} }
   canvas#c{touch-action:none}
+  #penbar{position:fixed;left:50%;top:12px;transform:translateX(-50%);display:none;gap:8px;align-items:center;background:rgba(18,18,18,.85);padding:8px 12px;border-radius:14px;z-index:5}
+  #penbar button{font:inherit;font-size:13px;border:2px solid #555;background:#222;color:#fff;border-radius:10px;padding:6px 10px;cursor:pointer}
+  #penbar .sw{width:34px;height:34px;border-radius:50%;padding:0;font-weight:700;font-size:12px}
+  #penbar .on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
+  .touch #tbtn button{width:52px;height:52px}
 </style>
 </head>
 <body>
@@ -47,14 +52,15 @@
 <div id="help">
   <kbd>W</kbd><kbd>S</kbd> / <kbd>↑</kbd><kbd>↓</kbd> مشي &nbsp; <kbd>A</kbd><kbd>D</kbd> جنب &nbsp; <kbd>←</kbd><kbd>→</kbd> لف<br>
   الماوس: بص حواليك (كليك أو اسحب) &nbsp; <kbd>Shift</kbd> جري<br>
-  <kbd>E</kbd> افتح/اقفل باب أو لوحة &nbsp; <kbd>L</kbd> النور &nbsp; <kbd>M</kbd> الخريطة &nbsp; <kbd>R</kbd> ارجع لباب الشقة &nbsp; <kbd>T</kbd> شات &nbsp; <kbd>-</kbd><kbd>+</kbd> زاوية الرؤية
+  <kbd>E</kbd> افتح/اقفل باب أو لوحة &nbsp; <kbd>L</kbd> النور &nbsp; <kbd>M</kbd> الخريطة &nbsp; <kbd>R</kbd> ارجع لباب الشقة &nbsp; <kbd>T</kbd> شات &nbsp; <kbd>P</kbd> قلم الرسم &nbsp; <kbd>-</kbd><kbd>+</kbd> زاوية الرؤية
 </div>
 <div id="hint"></div>
 <div id="cross"></div>
 <div id="start"><h1>جولة في الشقة 3D</h1><div class="card"><input id="nm" maxlength="20" placeholder="اسمك إيه؟" autocomplete="off"><div class="row"><button class="g" data-g="m">ولد</button><button class="g" data-g="f">بنت</button></div><button id="go">ادخل الشقة</button></div><p style="font-size:13px;color:#aaa">هتبدأ من عند باب الشقة — وهتشوف الناس اللي داخلة معاك واسمهم فوقهم</p></div>
 <div id="chatlog"></div><input id="chatin" maxlength="200" placeholder="اكتب رسالة واضغط Enter">
 <div id="stick"><div id="knob"></div></div>
-<div id="tbtn"><button id="bC">💬</button><button id="bL">💡</button><button id="bE">E</button></div>
+<div id="penbar"></div>
+<div id="tbtn"><button id="bP">✏️</button><button id="bC">💬</button><button id="bL">💡</button><button id="bE">E</button></div>
 <div id="err"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
@@ -144,23 +150,23 @@ const T_porc = tex(512, 512, (g, w, h) => {
   for (const p of [0, 256, 512]) { g.beginPath(); g.moveTo(p, 0); g.lineTo(p, h); g.stroke(); g.beginPath(); g.moveTo(0, p); g.lineTo(w, p); g.stroke(); }
 });
 // أرضية الأوض: بلاطات شكل خشب 20×120 (التكستشر = 1.2م)، u = طول اللوح
-const T_wood = tex(1024, 512, (g, w, h) => {
-  const rows = 6, rh = h / rows, cols = ['#9c7a54', '#a17f58', '#96744f', '#a4825b', '#9a7852', '#9f7d56'];
+const T_wood = tex(2048, 512, (g, w, h) => {   // 2.4م × 1.2م : 6 صفوف × لوحين 120سم
+  const rows = 6, rh = h / rows, base = [[160, 126, 88], [154, 120, 83], [166, 132, 94], [150, 117, 80], [158, 124, 87], [163, 129, 91]];
   for (let r = 0; r < rows; r++) {
-    const off = rnd() * w;
-    for (let k = -1; k < 1; k++) {
-      const x = off + k * w;
-      g.fillStyle = cols[(r * 5 + k + 7) % cols.length]; g.fillRect(x, r * rh, w, rh);
+    const off = Math.floor(rnd() * w);
+    for (let k = 0; k < 2; k++) {
+      const c = base[(r * 2 + k * 3 + ((rnd() * 3) | 0)) % base.length], x0 = off + k * w / 2;
+      for (const sh of [0, -w]) { g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(x0 + sh, r * rh, w / 2, rh); }
+      for (let i = 0; i < 70; i++) {
+        const y = r * rh + 2 + rnd() * (rh - 4), x = x0 + rnd() * w / 2, len = 80 + rnd() * 500;
+        g.strokeStyle = rnd() > 0.45 ? 'rgb(96,68,40)' : 'rgb(205,178,138)'; g.globalAlpha = 0.06 + rnd() * 0.16; g.lineWidth = 0.6 + rnd() * 2.4;
+        for (const sh of [0, -w]) { g.beginPath(); g.moveTo(x + sh, y); g.bezierCurveTo(x + sh + len * .3, y + (rnd() - .5) * 5, x + sh + len * .7, y + (rnd() - .5) * 5, x + sh + len, y + (rnd() - .5) * 3); g.stroke(); }
+      }
+      g.globalAlpha = 1;
     }
-    for (let i = 0; i < 46; i++) { // grain
-      g.strokeStyle = rnd() > 0.5 ? '#7c5c3b' : '#bfa07a'; g.globalAlpha = 0.10 + rnd() * 0.25; g.lineWidth = 0.6 + rnd() * 2.2;
-      const y = r * rh + rnd() * rh, x = rnd() * w, len = 60 + rnd() * 420;
-      g.beginPath(); g.moveTo(x, y); g.bezierCurveTo(x + len * .3, y + (rnd() - .5) * 6, x + len * .7, y + (rnd() - .5) * 6, x + len, y + (rnd() - .5) * 4); g.stroke();
-      g.beginPath(); g.moveTo(x - w, y); g.lineTo(x - w + len, y); g.stroke();
-    }
-    g.globalAlpha = 1; g.strokeStyle = '#7d5c3a'; g.lineWidth = 1.5;
-    g.beginPath(); g.moveTo(0, r * rh); g.lineTo(w, r * rh); g.stroke();
-    g.beginPath(); g.moveTo(off, r * rh); g.lineTo(off, (r + 1) * rh); g.stroke();
+    g.strokeStyle = 'rgba(92,66,40,0.75)'; g.lineWidth = 1.5;
+    g.beginPath(); g.moveTo(0, r * rh + 0.5); g.lineTo(w, r * rh + 0.5); g.stroke();
+    for (let k = 0; k < 2; k++) for (const sh of [0, -w]) { const x = off + k * w / 2 + sh; g.beginPath(); g.moveTo(x, r * rh); g.lineTo(x, (r + 1) * rh); g.stroke(); }
   }
 });
 // أرضية المطبخ بيج 40×40 (التكستشر = 0.8م)
@@ -384,7 +390,11 @@ function aoRoom(r, w = 0.30) {
     aoQuad(cx + dx * 0.003, 0, cz + dz * 0.003, cx + dx * 0.003, H, cz + dz * 0.003, dx * w * 0.7, 0, 0); aoQuad(cx + dx * 0.003, 0, cz + dz * 0.003, cx + dx * 0.003, H, cz + dz * 0.003, 0, 0, dz * w * 0.7);
   }
 }
-function column(x0, x1, z0, z1, mat = M.paint) { solid(x0, x1, 0, H, z0, z1, mat); }
+function column(x0, x1, z0, z1, skirt = null, sk = 0.09) {   // عمود/بروز في الحيطة + الوزر والكرنيش لافّين عليه
+  solid(x0, x1, 0, H, z0, z1, M.paint);
+  if (skirt) B(x0 - 0.012, x1 + 0.012, 0, sk, z0 - 0.012, z1 + 0.012, skirt);
+  B(x0 - 0.075, x1 + 0.075, H - 0.055, H, z0 - 0.075, z1 + 0.075, M.corn); B(x0 - 0.04, x1 + 0.04, H - 0.10, H - 0.055, z0 - 0.04, z1 + 0.04, M.corn);
+}
 
 // ---------- أبواب ----------
 function woodLeaf(w, h) {
@@ -398,6 +408,8 @@ function woodLeaf(w, h) {
     const lv = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.12, 10), M.brass); lv.rotation.z = Math.PI / 2; lv.position.set(w - 0.11, 1.05, s * (t / 2 + 0.04)); g.add(lv);
     const st = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.04, 8), M.brass); st.rotation.x = Math.PI / 2; st.position.set(w - 0.065, 1.05, s * (t / 2 + 0.02)); g.add(st);
   }
+  for (const hy of [0.22, 1.05, 1.86]) { const hg = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.10, 8), M.brass); hg.position.set(-0.004, hy, 0); g.add(hg); }   // مفصلات
+  for (const s of [-1, 1]) { const kh = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.004, 8), M.dark); kh.rotation.x = Math.PI / 2; kh.position.set(w - 0.065, 0.965, s * (t / 2 + 0.009)); g.add(kh); }   // الكالون
   return g;
 }
 function aluLeaf(w, h, kind) {
@@ -515,7 +527,7 @@ floor(R.terr.x0, R.terr.z0, R.terr.x1, R.terr.z1 + 0.12, M.porc, 1.2, 1.2);
 floor(R.kit.x0, R.kit.z0, R.kit.x1, R.kit.z1, M.kfloor, 0.9, 0.9);
 floor(R.serv.x0 - 0.12, R.serv.z0 - 0.12, R.serv.x1, R.serv.z1, M.kfloor, 0.8, 0.8);
 floor(R.bath.x0, R.bath.z0, R.bath.x1, R.bath.z1, M.bfloor, 1.2, 1.2);
-for (const k of ['master', 'bed', 'office']) floor(R[k].x0, R[k].z0, R[k].x1, R[k].z1, M.wood, 1.2, 1.2, k !== 'master');   // الماستر: الألواح بالعرض (شرق-غرب)
+for (const k of ['master', 'bed', 'office']) floor(R[k].x0, R[k].z0, R[k].x1, R[k].z1, M.wood, 2.4, 1.2, k !== 'master');   // الماستر: الألواح بالعرض (شرق-غرب)
 floor(R.land.x0, R.land.z0, R.land.x1, R.land.z1, M.concrete, 1, 1);
 for (const k of ['rec', 'kit', 'bath', 'master', 'bed', 'office', 'land']) ceiling(R[k].x0, R[k].z0, R[k].x1, R[k].z1);
 ceiling(R.corr.x0, R.corr.z0, R.corr.x1, R.corr.z1);
@@ -567,16 +579,25 @@ solid(6.29, 6.41, 0, 1.10, -0.09, 1.07, M.paint); solid(6.41, 7.61, 0, 1.10, -0.
 B(6.27, 6.43, 1.10, 1.14, -0.11, 1.07, M.corn); B(6.43, 7.61, 1.10, 1.14, -0.11, 0.05, M.corn);
 // بسطة السلم برا
 wall('z', -2.75, -0.17, 13.45, 13.60, [], M.landWall); wall('x', 13.45, 16.43, -2.75, -2.60, [], M.landWall); wall('z', -2.60, -0.17, 16.28, 16.43, [], M.landWall);
+{ // الأسانسير قصاد باب الشقة + شباك السلم
+  const zf = -2.60, ex = 15.40;
+  B(ex - 0.55, ex + 0.55, 0, 2.2, zf, zf + 0.03, M.grey);
+  B(ex - 0.45, ex - 0.005, 0.02, 2.1, zf + 0.03, zf + 0.045, M.steel); B(ex + 0.005, ex + 0.45, 0.02, 2.1, zf + 0.03, zf + 0.045, M.steel);
+  B(ex + 0.68, ex + 0.80, 1.05, 1.30, zf, zf + 0.02, M.steel); B(ex + 0.725, ex + 0.755, 1.15, 1.18, zf + 0.02, zf + 0.028, M.red);
+  B(ex - 0.12, ex + 0.12, 2.25, 2.37, zf, zf + 0.02, M.dark);
+  B(13.95, 14.65, 1.15, 2.05, zf, zf + 0.02, M.frost);
+  for (let i = 0; i < 6; i++) B(13.95, 14.65, 1.2 + i * 0.14, 1.23 + i * 0.14, zf + 0.02, zf + 0.04, M.alu);
+}
 // أرضية فتحة الطرقة
 floor(10.16, 3.20, 10.31, 4.20, M.porc, 1.2, 1.2, false, 0.001);
 
 // الأعمدة (من البلوبرنت)
-column(13.45, 14.16, 6.23, 6.43);                         // الريسبشن — على الحيطة الجنوبية بين باب التراس والشباك
-column(10.01, 10.16, 4.35, 5.35);                          // الأوفيس — شمال شرق
-column(7.13, 7.33, 7.52, 7.77); column(10.00, 10.16, 7.57, 7.77);
-column(3.95, 4.25, 4.35, 4.47);                           // أوضة النوم — شمال غرب
-column(3.95, 4.15, 7.57, 7.77); column(6.83, 6.98, 7.45, 7.77);
-column(0.20, 0.50, 3.20, 3.32);                           // الماستر — شمال غرب
+column(13.45, 14.16, 6.23, 6.43, M.skTile, 0.10);                         // الريسبشن — على الحيطة الجنوبية بين باب التراس والشباك
+column(10.01, 10.16, 4.35, 5.35, M.skWood);                          // الأوفيس — شمال شرق
+column(7.13, 7.33, 7.52, 7.77, M.skWood); column(10.00, 10.16, 7.57, 7.77, M.skWood);
+column(3.95, 4.25, 4.35, 4.47, M.skWood);                           // أوضة النوم — شمال غرب
+column(3.95, 4.15, 7.57, 7.77, M.skWood); column(6.83, 6.98, 7.45, 7.77, M.skWood);
+column(0.20, 0.32, 3.20, 3.56, M.skWood);                           // الماستر — شمال غرب
 
 /* =====================================================================
    المطبخ والحمام — سيراميك الحيطان
@@ -772,9 +793,8 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
   B(SX, SX + 0.08, 0, CB, SZ, z1, curbM); B(SX + 0.08, x1, 0, CB, SZ, SZ + 0.08, curbM);        // العتبة (حرف L)
   floor(SX + 0.08, SZ + 0.08, x1, z1, M.pebble, 0.5, 0.5, false, 0.03);                           // أرضية الدُش
   cyl(0.05, 0.006, M.steel, x1 - 0.25, 0.034, z1 - 0.3);
-  const xr = SX + 0.04, zr = SZ + 0.04;
+  const xr = SX + 0.04, zr = SZ + 0.04, WL = 0.60, NL = 0.45;   // طول الضلفة المنزلقة: الوش (غرب) / الجنب (شمال)
   cyl(0.02, z1 - SZ, M.chrome, xr, top, (SZ + z1) / 2, 'z'); cyl(0.02, x1 - SX, M.chrome, (SX + x1) / 2, top, zr, 'x');   // المواسير العلوية
-  B(xr - 0.022, xr + 0.022, CB, top, zr - 0.022, zr + 0.022, M.aluW);                             // قايم الركن
   B(xr - 0.015, xr + 0.015, CB, top, z1 - 0.03, z1, M.aluW); B(x1 - 0.03, x1, CB, top, zr - 0.015, zr + 0.015, M.aluW);     // قوايم الحيطة
   const pane = (par, axis, a, b, c) => {   // لوح زجاج بخطوط + برواز
     const m = new THREE.Mesh(new THREE.PlaneGeometry(b - a, top - CB - 0.04), M.stripes), ym = (top + CB) / 2 - 0.01, p = 0.014;
@@ -783,17 +803,24 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
     const bx = (s0, s1, y0, y1) => axis === 'z' ? B(c - p, c + p, y0, y1, s0, s1, M.aluW, par) : B(s0, s1, y0, y1, c - p, c + p, M.aluW, par);
     bx(a, a + 0.025, CB + 0.01, top - 0.03); bx(b - 0.025, b, CB + 0.01, top - 0.03); bx(a, b, CB + 0.01, CB + 0.035); bx(a, b, top - 0.055, top - 0.03);
   };
-  pane(scene, 'x', SX + 0.07, x1 - 0.03, zr);                                                      // الجنب الثابت (شمال)
-  pane(scene, 'z', SZ + 0.60, z1 - 0.03, xr + 0.012);                                              // ضلفة الوش الجنوبية
-  B(xr + 0.03, xr + 0.05, 0.92, 1.12, SZ + 0.635, SZ + 0.655, M.chrome);
-  const slide = new THREE.Group(); scene.add(slide);                                               // الضلفة المنزلقة (جنب قايم الركن)
-  pane(slide, 'z', SZ + 0.07, SZ + 0.66, xr - 0.012);
-  B(xr - 0.055, xr - 0.03, 0.92, 1.12, SZ + 0.10, SZ + 0.12, M.chrome, slide);
-  slide.userData = { t: 0, target: 0, slide: { axis: 'z', from: 0, to: 0.54 } }; pivots.push(slide);
-  interact.push({ x: SX, z: SZ + 0.35, label: 'باب كابينة الدُش', pivots: [slide] });
-  colliders.push({ x0: SX, x1: x1, z0: SZ, z1: SZ + 0.08 });                                       // الجنب
-  colliders.push({ x0: SX, x1: SX + 0.08, z0: SZ + 0.60, z1: z1 });                                // نص الوش الثابت
-  colliders.push({ x0: SX, x1: SX + 0.08, z0: SZ, z1: SZ + 0.60, on: () => slide.userData.target === 0 });
+  // الوش (غرب): لوح ثابت ناحية الباب + ضلفة منزلقة ناحية الركن
+  pane(scene, 'z', SZ + WL, z1 - 0.03, xr + 0.012);
+  const sW = new THREE.Group(); scene.add(sW);
+  pane(sW, 'z', SZ + 0.02, SZ + WL + 0.04, xr - 0.012);
+  B(xr - 0.065, xr - 0.03, 0.90, 1.14, SZ + 0.05, SZ + 0.075, M.aluW, sW);                         // المقبض الأبيض
+  sW.userData = { t: 0, target: 0, slide: { axis: 'z', from: 0, to: WL - 0.07 } }; pivots.push(sW);
+  interact.push({ x: SX - 0.10, z: SZ + 0.45, label: 'ضلفة الكابينة (الوش)', pivots: [sW] });
+  // الجنب (شمال): لوح ثابت ناحية الحيطة + ضلفة منزلقة ناحية الركن
+  pane(scene, 'x', SX + NL, x1 - 0.03, zr + 0.012);
+  const sN = new THREE.Group(); scene.add(sN);
+  pane(sN, 'x', SX + 0.02, SX + NL + 0.04, zr - 0.012);
+  B(SX + 0.05, SX + 0.075, 0.90, 1.14, zr - 0.065, zr - 0.03, M.aluW, sN);
+  sN.userData = { t: 0, target: 0, slide: { axis: 'x', from: 0, to: NL - 0.07 } }; pivots.push(sN);
+  interact.push({ x: SX + 0.30, z: SZ - 0.15, label: 'ضلفة الكابينة (الجنب)', pivots: [sN] });
+  colliders.push({ x0: SX, x1: SX + 0.08, z0: SZ + WL, z1: z1 });                                  // ثابت الوش
+  colliders.push({ x0: SX + NL, x1: x1, z0: SZ, z1: SZ + 0.08 });                                  // ثابت الجنب
+  colliders.push({ x0: SX, x1: SX + 0.08, z0: SZ, z1: SZ + WL, on: () => sW.userData.target === 0 });
+  colliders.push({ x0: SX, x1: SX + NL, z0: SZ, z1: SZ + 0.08, on: () => sN.userData.target === 0 });
   // عمود الدُش على الحيطة الشرقية
   const cx = x1 - 0.06, zc = (SZ + z1) / 2;
   cyl(0.012, 1.15, M.chrome, cx, 1.50, zc); cyl(0.011, 0.34, M.chrome, cx - 0.17, 2.07, zc, 'x');
@@ -816,18 +843,21 @@ bulb(8.65, 5.35); bulb(8.65, 6.75);                      // الأوفيس
 bulb(12.1, 7.15, 1.5);                                   // التراس
 bulb(15.0, -1.3, 1.2);                                   // السلم
 
-scene.add(new THREE.HemisphereLight(0xdfeaf5, 0x8f8473, 0.32));
+scene.add(new THREE.HemisphereLight(0xdfeaf5, 0x8f8473, 0.42));
 scene.add(new THREE.AmbientLight(0xffffff, 0.06));
-const sun = new THREE.DirectionalLight(0xfff3e0, 0.25); sun.position.set(6, 12, 14); scene.add(sun);
+// شمس داخلة من شبابيك الناحية الجنوبية (بظلال حقيقية)
+const sun = new THREE.DirectionalLight(0xfff0d8, 2.3); sun.position.set(-0.05, 24.75, 33.6); sun.target.position.set(8.2, 0, 3.9); scene.add(sun); scene.add(sun.target);
+sun.castShadow = true; { const ms = (('ontouchstart' in window) || navigator.maxTouchPoints > 0) ? 2048 : 4096; sun.shadow.mapSize.set(ms, ms); const sc = sun.shadow.camera; sc.left = -11; sc.right = 11; sc.top = 9; sc.bottom = -9; sc.near = 5; sc.far = 70; sc.updateProjectionMatrix(); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; }
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;
 
 /* =====================================================================
    برا (سما + عماير قصادنا + أرض)
    ===================================================================== */
 {
-  const g = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), M.ground); g.rotation.x = -Math.PI / 2; g.position.y = -9; scene.add(g);
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), M.ground); g.rotation.x = -Math.PI / 2; g.position.y = -9; g.userData.nc = true; scene.add(g);
   for (const [x, z, w, d, h] of [[-8, 34, 22, 14, 26], [20, 36, 20, 14, 30], [44, 30, 16, 16, 24], [-34, 20, 16, 20, 28], [10, -34, 30, 14, 28], [-22, -6, 12, 20, 26]]) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.facade.clone()); m.material.map = T_facade.clone(); m.material.map.repeat.set(w / 6, h / 12); m.material.map.needsUpdate = true;
-    m.position.set(x, -9 + h / 2, z); scene.add(m);
+    m.position.set(x, -9 + h / 2, z); m.userData.nc = true; scene.add(m);
   }
 }
 
@@ -850,6 +880,8 @@ addEventListener('keydown', e => {
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
   if (e.code === 'KeyE' || e.code === 'Space') useNearest();
   if (e.code === 'KeyL') toggleLights();
+  if (e.code === 'KeyP') penToggle();
+  if (PEN.on) { const di = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6'].indexOf(e.code); if (di >= 0) penColor(PEN_COLORS[di]); if (e.code === 'KeyX') penErase(!PEN.erase); if (e.code === 'Delete') strokesClearAll(); }
   if (e.code === 'KeyM') mapEl.style.display = mapEl.style.display === 'none' ? '' : 'none';
   if (['BracketLeft', 'BracketRight', 'Minus', 'Equal'].includes(e.code)) { camera.fov = Math.max(55, Math.min(100, camera.fov + ((e.code === 'BracketRight' || e.code === 'Equal') ? 3 : -3))); camera.updateProjectionMatrix(); fovEl.textContent = camera.fov.toFixed(0); }
   if (e.code === 'KeyR') { pl.x = START.x; pl.z = START.z; pl.yaw = START.yaw; pl.pitch = 0; }
@@ -857,10 +889,11 @@ addEventListener('keydown', e => {
 addEventListener('keyup', e => { keys[e.code] = false; });
 const lock = () => { try { const r = canvas.requestPointerLock?.(); if (r && r.catch) r.catch(() => {}); } catch (e) {} };
 let dragging = false, moved = 0;
-canvas.addEventListener('mousedown', () => { dragging = true; moved = 0; });
-addEventListener('mouseup', () => { if (dragging && moved < 4) lock(); dragging = false; });
+canvas.addEventListener('mousedown', e => { if (PEN.on) { PEN.drawing = true; setNDC(e.clientX, e.clientY); return; } dragging = true; moved = 0; });
+addEventListener('mouseup', () => { if (PEN.drawing) { PEN.drawing = false; penFlush(true); } if (dragging && moved < 4) lock(); dragging = false; });
 addEventListener('mousemove', e => {   // pointer lock لو متاح ، وإلا سحب بالماوس
   const locked = document.pointerLockElement === canvas;
+  setNDC(e.clientX, e.clientY);
   if (!locked && !dragging) return;
   moved += Math.abs(e.movementX) + Math.abs(e.movementY);
   const k = locked ? 0.0022 : 0.004;
@@ -900,7 +933,7 @@ function step(dt) {
     const mx = (fx * f + rx * s) * sp, mz = (fz * f + rz * s) * sp, n = Math.ceil(Math.hypot(mx, mz) / 0.06) || 1;
     for (let i = 0; i < n; i++) { pl.x += mx / n; pl.z += mz / n; collide(); }
   }
-  for (const p of pivots) { const u = p.userData; if (u.t !== u.target) { const dlt = Math.sign(u.target - u.t) * dt * 1.8; u.t = Math.abs(u.target - u.t) <= Math.abs(dlt) ? u.target : u.t + dlt; if (u.slide) p.position[u.slide.axis] = u.slide.from + (u.slide.to - u.slide.from) * u.t; else p.rotation.y = u.base + u.amp * u.t; } }
+  for (const p of pivots) { const u = p.userData; if (u.t !== u.target) { shDirty = 2; const dlt = Math.sign(u.target - u.t) * dt * 1.8; u.t = Math.abs(u.target - u.t) <= Math.abs(dlt) ? u.target : u.t + dlt; if (u.slide) p.position[u.slide.axis] = u.slide.from + (u.slide.to - u.slide.from) * u.t; else p.rotation.y = u.base + u.amp * u.t; } }
   camera.position.set(pl.x, EYE, pl.z); camera.rotation.set(pl.pitch, pl.yaw, 0);
   // أقرب حاجة تتفتح
   nearIt = null; let best = 1.9;
@@ -929,39 +962,86 @@ function labelSprite(text, bg = 'rgba(20,20,20,0.78)', fg = '#fff') {
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
   sp.scale.set(1.0, 0.25, 1); sp.renderOrder = 5; return sp;
 }
-function makeAvatar(name, g) {   // شخص بطول 1.70م من primitives — وشّه ناحية -Z
-  const grp = new THREE.Group(), f = g === 'f';
-  const skin = S({ color: 0xe2b48f, roughness: 0.7 }), top = S({ color: f ? 0xd6508a : 0x2f6fd0, roughness: 0.85 }),
-        bottom = S({ color: f ? 0x7a3f86 : 0x2b2f3a, roughness: 0.85 }), hair = S({ color: f ? 0x3a2416 : 0x1f1611, roughness: 0.9 }), shoe = S({ color: 0x1b1b1b, roughness: 0.6 });
-  const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); grp.add(m); return m; };
-  for (const sx of [-0.09, 0.09]) {
-    add(new THREE.CylinderGeometry(0.07, 0.06, 0.82, 12), f ? skin : bottom, sx, 0.47, 0);
-    add(new THREE.BoxGeometry(0.1, 0.06, 0.24), shoe, sx, 0.03, -0.04);
-    add(new THREE.CylinderGeometry(0.048, 0.042, 0.58, 10), f ? skin : top, sx * 2.55, 1.08, 0);
-    add(new THREE.SphereGeometry(0.05, 10, 8), skin, sx * 2.55, 0.77, 0);
+function makeAvatar(name, g) {   // شخص من primitives (Capsule / Lathe / Sphere) بمفاصل بتتحرك — وشّه ناحية -Z
+  const f = g === 'f', grp = new THREE.Group(), U = grp.userData;
+  let hsh = 7; for (const ch of name) hsh = (hsh * 31 + ch.codePointAt(0)) >>> 0;
+  const pick = (a, s = 0) => a[((hsh >>> s) & 0xffff) % a.length];
+  const skin = S({ color: pick([0xe8b98f, 0xd9a47a, 0xc98f63, 0xf0c8a0, 0xb97f55], 3), roughness: 0.62 });
+  const top = S({ color: f ? pick([0xc9477f, 0x8e5bb5, 0x2e9c94, 0xe6d3b8, 0xd4634a, 0x4a6fb5]) : pick([0x2f62b8, 0x3a7d5c, 0x8a8f98, 0xf1efe8, 0x7a3b3b, 0x26313f]), roughness: 0.85, side: THREE.DoubleSide });
+  const bottom = S({ color: f ? pick([0x2d2f45, 0x3b2f2a, 0x59607a], 5) : pick([0x23272f, 0x3a4660, 0x4b3f33], 5), roughness: 0.9 });
+  const hairM = S({ color: pick([0x1c130d, 0x2b1b12, 0x3a2516, 0x120d0a], 7), roughness: 0.8 });
+  const shoe = S({ color: f ? 0xe9e4da : 0x1c1c1e, roughness: 0.55 }), white = S({ color: 0xf5f5f2, roughness: 0.35 }), lip = S({ color: f ? 0xb0504f : 0x9a5a4c, roughness: 0.6 });
+  const mesh = (geo, mat, par, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; par.add(m); return m; };
+  const body = new THREE.Group(); body.scale.setScalar(f ? 0.945 : 1); grp.add(body); U.body = body;
+  // ---- الرجلين: ورك → ركبة → قدم
+  U.hip = []; U.knee = [];
+  for (const sx of [-1, 1]) {
+    const hip = new THREE.Group(); hip.position.set(sx * 0.092, 0.93, 0); body.add(hip); U.hip.push(hip);
+    mesh(new THREE.CapsuleGeometry(f ? 0.07 : 0.078, 0.30, 6, 14), bottom, hip, 0, -0.215, 0);
+    const knee = new THREE.Group(); knee.position.set(0, -0.44, 0); hip.add(knee); U.knee.push(knee);
+    mesh(new THREE.CapsuleGeometry(f ? 0.052 : 0.06, 0.30, 6, 14), bottom, knee, 0, -0.20, 0);
+    const foot = mesh(new THREE.CapsuleGeometry(0.045, 0.15, 6, 12), shoe, knee, 0, -0.445, -0.055); foot.rotation.x = Math.PI / 2; foot.scale.set(1.05, 1, 0.8);
   }
-  if (f) add(new THREE.CylinderGeometry(0.15, 0.30, 0.62, 18), bottom, 0, 0.70, 0);                 // جيبة
-  add(new THREE.CylinderGeometry(0.19, f ? 0.14 : 0.17, 0.52, 18), top, 0, 1.14, 0).scale.z = 0.62;   // الجسم
-  add(new THREE.CylinderGeometry(0.05, 0.055, 0.08, 10), skin, 0, 1.44, 0);
-  add(new THREE.SphereGeometry(0.115, 20, 16), skin, 0, 1.585, 0);                                   // الراس
-  const cap = add(new THREE.SphereGeometry(0.122, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hair, 0, 1.60, 0.012);
-  if (f) { add(new THREE.CylinderGeometry(0.12, 0.10, 0.34, 14), hair, 0, 1.44, 0.07).scale.z = 0.5; cap.scale.set(1.04, 1.04, 1.06); }
-  for (const ex of [-0.04, 0.04]) add(new THREE.SphereGeometry(0.014, 8, 8), M.dark, ex, 1.60, -0.108);   // العيون
-  add(new THREE.BoxGeometry(0.02, 0.03, 0.02), skin, 0, 1.565, -0.118);
-  const lab = labelSprite(name, f ? 'rgba(170,40,110,0.85)' : 'rgba(30,90,190,0.85)'); lab.position.y = 1.95; grp.add(lab);
-  grp.userData.lab = lab; return grp;
+  // ---- الجسم
+  const prof = (f ? [[0.150, 0.86], [0.172, 0.93], [0.160, 1.00], [0.128, 1.10], [0.150, 1.22], [0.170, 1.31], [0.168, 1.38], [0.120, 1.44], [0.055, 1.47]]
+                  : [[0.150, 0.86], [0.165, 0.93], [0.160, 1.02], [0.158, 1.12], [0.180, 1.24], [0.200, 1.34], [0.195, 1.40], [0.130, 1.455], [0.058, 1.48]]).map(p => new THREE.Vector2(p[0], p[1]));
+  mesh(new THREE.LatheGeometry(prof, 26), top, body).scale.z = 0.64;
+  mesh(new THREE.SphereGeometry(0.16, 18, 12), bottom, body, 0, 0.90, 0).scale.set(1.02, 0.55, 0.66);
+  if (f) mesh(new THREE.LatheGeometry([[0.170, 0.95], [0.190, 0.82], [0.205, 0.70]].map(p => new THREE.Vector2(p[0], p[1])), 26), top, body).scale.z = 0.72;   // بلوزة طويلة
+  // ---- الدراعات: كتف → كوع → إيد
+  U.sh = []; U.el = [];
+  for (const sx of [-1, 1]) {
+    const sh = new THREE.Group(); sh.position.set(sx * (f ? 0.185 : 0.215), 1.385, 0); sh.rotation.z = sx * 0.07; body.add(sh); U.sh.push(sh);
+    mesh(new THREE.SphereGeometry(0.058, 14, 10), top, sh);
+    mesh(new THREE.CapsuleGeometry(f ? 0.04 : 0.047, 0.21, 6, 12), top, sh, 0, -0.15, 0);
+    const el = new THREE.Group(); el.position.set(0, -0.30, 0); el.rotation.x = 0.18; sh.add(el); U.el.push(el);
+    mesh(new THREE.CapsuleGeometry(f ? 0.034 : 0.04, 0.19, 6, 12), f ? top : skin, el, 0, -0.125, 0);
+    mesh(new THREE.SphereGeometry(0.043, 12, 10), skin, el, 0, -0.275, 0).scale.set(0.75, 1.15, 0.5);
+  }
+  // ---- الرقبة والراس والوش
+  mesh(new THREE.CylinderGeometry(0.048, 0.055, 0.09, 14), skin, body, 0, 1.50, 0);
+  const head = new THREE.Group(); head.position.set(0, 1.635, 0); body.add(head); U.head = head;
+  mesh(new THREE.SphereGeometry(0.108, 28, 22), skin, head).scale.set(0.93, 1.13, 1.0);
+  mesh(new THREE.SphereGeometry(0.07, 16, 12), skin, head, 0, -0.065, -0.02).scale.set(1.0, 0.8, 1.0);
+  for (const sx of [-1, 1]) {
+    mesh(new THREE.SphereGeometry(0.022, 10, 8), skin, head, sx * 0.099, -0.005, 0.005).scale.set(0.45, 1, 0.7);
+    mesh(new THREE.SphereGeometry(0.0155, 12, 10), white, head, sx * 0.038, 0.012, -0.094).scale.set(1.25, 0.8, 0.6);
+    mesh(new THREE.SphereGeometry(0.0085, 10, 8), M.dark, head, sx * 0.038, 0.012, -0.103).scale.z = 0.5;
+    mesh(new THREE.BoxGeometry(0.034, 0.006, 0.008), hairM, head, sx * 0.038, 0.04, -0.099).rotation.z = -sx * 0.12;
+  }
+  mesh(new THREE.ConeGeometry(0.013, 0.04, 8), skin, head, 0, -0.012, -0.108).rotation.x = -1.9;
+  mesh(new THREE.BoxGeometry(0.036, 0.007, 0.006), lip, head, 0, -0.058, -0.094);
+  mesh(new THREE.SphereGeometry(0.114, 26, 16, 0, Math.PI * 2, 0, Math.PI * 0.52), hairM, head, 0, 0.012, 0.012).scale.set(0.97, 1.15, 1.06);
+  if (f) {
+    mesh(new THREE.CapsuleGeometry(0.085, 0.20, 6, 14), hairM, head, 0, -0.13, 0.065).scale.set(1.15, 1, 0.55);
+    for (const sx of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.03, 0.16, 5, 10), hairM, head, sx * 0.093, -0.085, 0.012);
+  }
+  const lab = labelSprite(name, f ? 'rgba(170,40,110,0.85)' : 'rgba(30,90,190,0.85)'); lab.position.y = f ? 1.88 : 1.98; grp.add(lab);
+  U.lab = lab; U.nh = true; U.phase = 0; U.amp = 0;
+  return grp;
+}
+function animAvatar(grp, dist, dt) {   // مشي: رجلين ودراعات بتتحرك مع المسافة
+  const U = grp.userData, sp = dist / Math.max(dt, 1e-3);
+  U.amp += ((sp > 0.12 ? Math.min(1, sp / 1.1) : 0) - U.amp) * Math.min(1, dt * 8);
+  U.phase += dist * 4.4;
+  const s = Math.sin(U.phase), c = Math.cos(U.phase), a = U.amp;
+  U.hip[0].rotation.x = s * 0.55 * a; U.hip[1].rotation.x = -s * 0.55 * a;
+  U.knee[0].rotation.x = -a * 0.7 * Math.max(0, c); U.knee[1].rotation.x = -a * 0.7 * Math.max(0, -c);
+  U.sh[0].rotation.x = -s * 0.42 * a; U.sh[1].rotation.x = s * 0.42 * a;
+  U.el[0].rotation.x = U.el[1].rotation.x = 0.18 + 0.28 * a;
+  U.body.position.y = Math.abs(c) * 0.022 * a;
 }
 function peerSet(id, d) {
   let p = peers.get(id);
   if (!p) {
     p = { name: String(d.n || '؟').slice(0, 20), g: d.g === 'f' ? 'f' : 'm', x: d.x, z: d.z, yaw: d.y, tx: d.x, tz: d.z, tyaw: d.y, last: performance.now(), bubble: null, bt: 0 };
-    p.grp = makeAvatar(p.name, p.g); p.grp.position.set(p.x, 0, p.z); scene.add(p.grp); peers.set(id, p);
+    p.grp = makeAvatar(p.name, p.g); p.grp.position.set(p.x, 0, p.z); scene.add(p.grp); peers.set(id, p); shDirty = 3;
     sys(p.name + (p.g === 'f' ? ' دخلت الشقة' : ' دخل الشقة')); refreshNet();
   }
   p.tx = +d.x; p.tz = +d.z; p.tyaw = +d.y; p.last = performance.now();
   return p;
 }
-function peerDrop(id) { const p = peers.get(id); if (!p) return; scene.remove(p.grp); peers.delete(id); sys(p.name + (p.g === 'f' ? ' خرجت' : ' خرج')); refreshNet(); }
+function peerDrop(id) { const p = peers.get(id); if (!p) return; scene.remove(p.grp); peers.delete(id); shDirty = 3; sys(p.name + (p.g === 'f' ? ' خرجت' : ' خرج')); refreshNet(); }
 function refreshNet() {
   const names = [...peers.values()].map(p => p.name);
   netEl.textContent = (ME.name ? 'أنت: ' + ME.name + ' — ' : '') + (online ? 'أونلاين' : 'أوفلاين') + ' — ' + (names.length ? 'معاك: ' + names.join('، ') : 'لوحدك دلوقتي');
@@ -990,7 +1070,10 @@ function onMsg(topic, payload) {
   else if (k === 'c') { const p = peers.get(d.i), m = String(d.m || '').slice(0, 200); if (!m) return; addLine(p ? p.name : String(d.n || '؟').slice(0, 20), m);
     if (p) { if (p.bubble) p.grp.remove(p.bubble); p.bubble = labelSprite(m.length > 26 ? m.slice(0, 25) + '…' : m, 'rgba(255,255,255,0.92)', '#111'); p.bubble.position.y = 2.22; p.grp.add(p.bubble); p.bt = 6; } }
   else if (k === 'bye') peerDrop(d.i);
-  else if (k === 'hi') lastHb = 0;   // حد لسه داخل — ابعتله مكاني فوراً
+  else if (k === 'hi') { lastHb = 0; strokesSyncTo(d.i); }   // حد لسه داخل — ابعتله مكاني والرسومات
+  else if (k === 'dr') netStroke(d);
+  else if (k === 'de') { if (Array.isArray(d.ids)) d.ids.slice(0, 500).forEach(id => strokeDel(String(id))); }
+  else if (k === 'dc') strokesClear();
 }
 function netStart() {
   if (!window.mqtt) { refreshNet(); return; }
@@ -1010,9 +1093,10 @@ function netTick(dt) {
   const now = performance.now();
   for (const [id, p] of peers) {
     if (now - p.last > 12000) { peerDrop(id); continue; }
-    const k = Math.min(1, dt * 9); p.x += (p.tx - p.x) * k; p.z += (p.tz - p.z) * k;
+    const k = Math.min(1, dt * 9), ox = p.x, oz = p.z; p.x += (p.tx - p.x) * k; p.z += (p.tz - p.z) * k;
     let dy = p.tyaw - p.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); p.yaw += dy * k;
     p.grp.position.set(p.x, 0, p.z); p.grp.rotation.y = p.yaw;
+    { const mv = Math.hypot(p.x - ox, p.z - oz); animAvatar(p.grp, mv, dt); if (mv > 0.0015) shDirty = 2; }
     if (p.bubble && (p.bt -= dt) <= 0) { p.grp.remove(p.bubble); p.bubble = null; }
   }
 }
@@ -1057,15 +1141,117 @@ if (isTouch) {
   const stick = document.getElementById('stick'), knob = document.getElementById('knob');
   canvas.addEventListener('touchstart', e => { e.preventDefault(); for (const t of e.changedTouches) {
     if (t.clientX < innerWidth * 0.45 && joy.id === null) { joy.id = t.identifier; joy.sx = t.clientX; joy.sy = t.clientY; stick.style.display = 'block'; stick.style.left = (t.clientX - 55) + 'px'; stick.style.top = (t.clientY - 55) + 'px'; knob.style.transform = 'translate(0,0)'; }
-    else if (look.id === null) { look.id = t.identifier; look.x = t.clientX; look.y = t.clientY; } } }, { passive: false });
+    else if (look.id === null) { look.id = t.identifier; look.x = t.clientX; look.y = t.clientY; if (PEN.on) { PEN.drawing = true; setNDC(t.clientX, t.clientY); } } } }, { passive: false });
   canvas.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.changedTouches) {
     if (t.identifier === joy.id) { let dx = t.clientX - joy.sx, dy = t.clientY - joy.sy; const m = Math.hypot(dx, dy), R0 = 48; if (m > R0) { dx *= R0 / m; dy *= R0 / m; } joy.s = dx / R0; joy.f = -dy / R0; knob.style.transform = `translate(${dx}px,${dy}px)`; }
-    else if (t.identifier === look.id) { pl.yaw -= (t.clientX - look.x) * 0.006; pl.pitch = Math.max(-1.45, Math.min(1.45, pl.pitch - (t.clientY - look.y) * 0.006)); look.x = t.clientX; look.y = t.clientY; } } }, { passive: false });
-  const end = e => { for (const t of e.changedTouches) { if (t.identifier === joy.id) { joy.id = null; joy.f = joy.s = 0; stick.style.display = 'none'; } if (t.identifier === look.id) look.id = null; } };
+    else if (t.identifier === look.id) { if (PEN.on) setNDC(t.clientX, t.clientY); else { pl.yaw -= (t.clientX - look.x) * 0.006; pl.pitch = Math.max(-1.45, Math.min(1.45, pl.pitch - (t.clientY - look.y) * 0.006)); } look.x = t.clientX; look.y = t.clientY; } } }, { passive: false });
+  const end = e => { for (const t of e.changedTouches) { if (t.identifier === joy.id) { joy.id = null; joy.f = joy.s = 0; stick.style.display = 'none'; } if (t.identifier === look.id) { look.id = null; if (PEN.drawing) { PEN.drawing = false; penFlush(true); } } } };
   canvas.addEventListener('touchend', end); canvas.addEventListener('touchcancel', end);
   document.getElementById('bE').addEventListener('click', () => { useNearest(); });
   document.getElementById('bC').addEventListener('click', chatOpen);
   document.getElementById('bL').addEventListener('click', toggleLights);
+}
+
+/* =====================================================================
+   القلم: ارسم على أي حيطة/سطح عشان تشاور على حاجة — ألوان + ممحاة — متزامن مع الكل
+   ===================================================================== */
+const strokes = new Map();   // id -> { c, pts:[[x,y,z,nx,ny,nz]...], mesh }
+const PEN_COLORS = [0xff3b30, 0xffcc00, 0x34c759, 0x0a84ff, 0xffffff, 0x111111];
+const PEN = { on: false, erase: false, color: PEN_COLORS[0], drawing: false, cur: null, lastSent: 0, seq: 0, w: 0.016 };
+const penBar = document.getElementById('penbar'), crossEl = document.getElementById('cross');
+const dRay = new THREE.Raycaster(); dRay.far = 14;
+const ndc = new THREE.Vector2(0, 0);
+const setNDC = (cx, cy) => ndc.set(cx / innerWidth * 2 - 1, -(cy / innerHeight * 2 - 1));
+const r3 = v => Math.round(v * 1000) / 1000, r2 = v => Math.round(v * 100) / 100;
+function surfaceHit(nx, ny) {
+  dRay.setFromCamera(new THREE.Vector2(nx, ny), camera);
+  for (const h of dRay.intersectObjects(scene.children, true)) {
+    const o = h.object; if (!o.isMesh || !h.face) continue;
+    const m = o.material; if (!Array.isArray(m) && (m === M.glass || m === M.stripes || m === M_ao)) continue;
+    let a = o, skip = false; while (a) { if (a.userData && a.userData.nh) { skip = true; break; } a = a.parent; }
+    if (skip) continue;
+    const n = h.face.normal.clone().transformDirection(o.matrixWorld);
+    if (n.dot(dRay.ray.direction) > 0) n.negate();
+    return { p: h.point, n };
+  }
+  return null;
+}
+function strokeMesh(st) {
+  if (st.mesh) { scene.remove(st.mesh); st.mesh.geometry.dispose(); st.mesh.material.dispose(); st.mesh = null; }
+  let P = st.pts; if (!P.length) return;
+  if (P.length === 1) { const q = P[0], ax = Math.abs(q[4]) > 0.9 ? [1, 0, 0] : [0, 1, 0];   // نقطة واحدة → شرطة صغيرة
+    const t = [ax[1] * q[5] - ax[2] * q[4], ax[2] * q[3] - ax[0] * q[5], ax[0] * q[4] - ax[1] * q[3]];
+    P = [[q[0] - t[0] * 0.008, q[1] - t[1] * 0.008, q[2] - t[2] * 0.008, q[3], q[4], q[5]], [q[0] + t[0] * 0.008, q[1] + t[1] * 0.008, q[2] + t[2] * 0.008, q[3], q[4], q[5]]]; }
+  const pos = [], idx = [], hw = PEN.w / 2;
+  for (let i = 0; i < P.length; i++) {
+    const a = P[Math.max(0, i - 1)], b = P[Math.min(P.length - 1, i + 1)], q = P[i];
+    let dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2]; const L = Math.hypot(dx, dy, dz) || 1; dx /= L; dy /= L; dz /= L;
+    let sx = dy * q[5] - dz * q[4], sy = dz * q[3] - dx * q[5], sz = dx * q[4] - dy * q[3]; const SL = Math.hypot(sx, sy, sz) || 1; sx *= hw / SL; sy *= hw / SL; sz *= hw / SL;
+    const ox = q[0] + q[3] * 0.007, oy = q[1] + q[4] * 0.007, oz = q[2] + q[5] * 0.007;
+    pos.push(ox + sx, oy + sy, oz + sz, ox - sx, oy - sy, oz - sz);
+    if (i) { const k = i * 2; idx.push(k - 2, k - 1, k, k - 1, k + 1, k); }
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx);
+  const mesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: st.c, side: THREE.DoubleSide, toneMapped: false }));
+  mesh.userData.nh = true; mesh.renderOrder = 3; mesh.frustumCulled = false; scene.add(mesh); st.mesh = mesh;
+}
+function strokeSet(id, c, pts) { let st = strokes.get(id); if (!st) { st = { c, pts, mesh: null }; strokes.set(id, st); } else { st.c = c; st.pts = pts; } strokeMesh(st); }
+function strokeDel(id) { const st = strokes.get(id); if (!st) return; if (st.mesh) { scene.remove(st.mesh); st.mesh.geometry.dispose(); st.mesh.material.dispose(); } strokes.delete(id); }
+function strokesClear() { for (const id of [...strokes.keys()]) strokeDel(id); PEN.cur = null; }
+function netStroke(d) {
+  if (typeof d.id !== 'string' || d.id.length > 40 || !Array.isArray(d.pts) || d.pts.length > 320) return;
+  const pts = []; for (const q of d.pts) { if (!Array.isArray(q) || q.length !== 6 || !q.every(Number.isFinite)) return; pts.push(q); }
+  strokeSet(d.id, (d.c >>> 0) & 0xffffff, pts);
+}
+function strokesSyncTo(newId) {   // لما حد يدخل جديد: واحد بس (أصغر id) يبعتله الرسومات الموجودة
+  if (!strokes.size) return;
+  let min = ME.id; for (const id of peers.keys()) if (id !== newId && id < min) min = id;
+  if (min !== ME.id) return;
+  let n = 0; for (const [id, st] of strokes) { if (n++ > 160) break; setTimeout(() => pub('dr', { i: ME.id, id, c: st.c, pts: st.pts }), 300 + n * 40); }
+}
+const newStroke = () => (PEN.cur = { id: ME.id + '-' + (PEN.seq++).toString(36), pts: [] });
+function penFlush(final) { const c = PEN.cur; if (c && c.pts.length) { pub('dr', { i: ME.id, id: c.id, c: PEN.color, pts: c.pts }); PEN.lastSent = performance.now(); } if (final) PEN.cur = null; }
+function penPoint(nx, ny) {
+  const h = surfaceHit(nx, ny); if (!h) return;
+  if (PEN.erase) {
+    const del = []; for (const [id, st] of strokes) if (st.pts.some(q => (q[0] - h.p.x) ** 2 + (q[1] - h.p.y) ** 2 + (q[2] - h.p.z) ** 2 < 0.0064)) del.push(id);
+    if (del.length) { del.forEach(strokeDel); pub('de', { i: ME.id, ids: del }); }
+    return;
+  }
+  const q = [r3(h.p.x), r3(h.p.y), r3(h.p.z), r2(h.n.x), r2(h.n.y), r2(h.n.z)];
+  let c = PEN.cur || newStroke();
+  const l = c.pts[c.pts.length - 1];
+  if (l) {
+    const d = Math.hypot(q[0] - l[0], q[1] - l[1], q[2] - l[2]); if (d < 0.012) return;
+    if (d > 0.5 || l[3] * q[3] + l[4] * q[4] + l[5] * q[5] < 0.6 || c.pts.length >= 250) { penFlush(true); c = newStroke(); }   // سطح تاني أو قفزة → خط جديد
+  }
+  c.pts.push(q); strokeSet(c.id, PEN.color, c.pts);
+}
+function penTick() {
+  if (!PEN.on || !PEN.drawing) return;
+  const locked = document.pointerLockElement === canvas;
+  penPoint(locked ? 0 : ndc.x, locked ? 0 : ndc.y);
+  if (PEN.cur && performance.now() - PEN.lastSent > 350) penFlush(false);
+}
+function penUI() {
+  penBar.style.display = PEN.on ? 'flex' : 'none';
+  for (const b of penBar.children) b.classList.toggle('on', (b.dataset.c !== undefined && +b.dataset.c === PEN.color && !PEN.erase) || (b.dataset.k === 'er' && PEN.erase));
+  const hex = '#' + PEN.color.toString(16).padStart(6, '0');
+  crossEl.style.background = PEN.on ? (PEN.erase ? 'transparent' : hex) : '';
+  crossEl.style.width = crossEl.style.height = PEN.on ? (PEN.erase ? '22px' : '12px') : '';
+  crossEl.style.margin = PEN.on ? (PEN.erase ? '-11px' : '-6px') : '';
+  crossEl.style.border = PEN.on && PEN.erase ? '2px solid #fff' : '';
+  canvas.style.cursor = PEN.on ? 'crosshair' : '';
+}
+function penToggle() { PEN.on = !PEN.on; if (!PEN.on) { PEN.drawing = false; penFlush(true); PEN.erase = false; } penUI(); }
+function penColor(c) { PEN.color = c; PEN.erase = false; penFlush(true); penUI(); }
+function penErase(v) { PEN.erase = v; penFlush(true); penUI(); }
+function strokesClearAll() { strokesClear(); pub('dc', { i: ME.id }); }
+{
+  PEN_COLORS.forEach((c, i) => { const b = document.createElement('button'); b.className = 'sw'; b.dataset.c = c; b.style.background = '#' + c.toString(16).padStart(6, '0'); b.style.color = (c === 0xffffff || c === 0xffcc00) ? '#222' : '#fff'; b.textContent = i + 1; b.onclick = () => penColor(c); penBar.appendChild(b); });
+  const mk = (txt, fn, k) => { const b = document.createElement('button'); b.textContent = txt; if (k) b.dataset.k = k; b.onclick = fn; penBar.appendChild(b); };
+  mk('ممحاة', () => penErase(!PEN.erase), 'er'); mk('مسح الكل', strokesClearAll); mk('✕', penToggle);
+  const bP = document.getElementById('bP'); if (bP) bP.addEventListener('click', penToggle);
 }
 
 /* =====================================================================
@@ -1092,7 +1278,7 @@ function hud(dt) {
   curRoom = null; for (const k in R) { const r = R[k]; if (pl.x >= r.x0 && pl.x <= r.x1 && pl.z >= r.z0 && pl.z <= r.z1) { curRoom = k; break; } }
   roomEl.textContent = curRoom ? R[curRoom].name : '—'; dimsEl.textContent = curRoom ? R[curRoom].dims : '—';
   ray.setFromCamera(new THREE.Vector2(0, 0), camera);
-  const hit = ray.intersectObjects(scene.children, true).find(h => h.object.material !== M.glass && h.distance > 0.05);
+  const hit = ray.intersectObjects(scene.children, true).find(h => h.object.material !== M.glass && h.object.material !== M_ao && !h.object.userData.nh && h.object.isMesh && h.distance > 0.05);
   distEl.textContent = hit ? hit.distance.toFixed(2) : '—';
   drawMap();
 }
@@ -1100,15 +1286,19 @@ function hud(dt) {
 /* =====================================================================
    loop
    ===================================================================== */
+let shDirty = 4;
+scene.traverse(o => { if (!o.isMesh) return; const m = o.material, soft = !Array.isArray(m) && (m.transparent || m.isMeshBasicMaterial); o.castShadow = !soft && !o.userData.nc; o.receiveShadow = !soft; });
 const clock = new THREE.Clock();
 function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
-  step(dt); netTick(dt); hud(dt); renderer.render(scene, camera);
+  step(dt); netTick(dt); penTick(); hud(dt);
+  if (shDirty > 0) { renderer.shadowMap.needsUpdate = true; shDirty--; }
+  renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
 tick();
 // للتجربة من الكونسول
-window.__apt = { peers, ME, pl, R, colliders, interact, scene, camera, renderer, step, THREE, frame: () => { step(0.001); hudT = 1; hud(0); renderer.render(scene, camera); } };
+window.__apt = { peers, ME, pl, R, colliders, interact, scene, camera, renderer, step, THREE, frame: () => { step(0.001); hudT = 1; hud(0); renderer.shadowMap.needsUpdate = true; renderer.render(scene, camera); }, pen: { PEN, strokes, penToggle, penPoint, penFlush, strokesClearAll } };
 </script>
 </body>
 </html>
