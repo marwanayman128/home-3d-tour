@@ -161,10 +161,11 @@ const T_porc = tex(512, 512, (g, w, h) => {
   for (const p of [0, 256, 512]) { g.beginPath(); g.moveTo(p, 0); g.lineTo(p, h); g.stroke(); g.beginPath(); g.moveTo(0, p); g.lineTo(w, p); g.stroke(); }
 });
 // أرضية الأوض: بلاطات شكل خشب 20×120 (التكستشر = 1.2م)، u = طول اللوح
+const woodOffs = [];
 const T_wood = tex(2048, 512, (g, w, h) => {   // 2.4م × 1.2م : 6 صفوف × لوحين 120سم
   const rows = 6, rh = h / rows, base = [[160, 126, 88], [154, 120, 83], [166, 132, 94], [150, 117, 80], [158, 124, 87], [163, 129, 91]];
   for (let r = 0; r < rows; r++) {
-    const off = Math.floor(rnd() * w);
+    const off = Math.floor(rnd() * w); woodOffs.push(off);
     for (let k = 0; k < 2; k++) {
       const c = base[(r * 2 + k * 3 + ((rnd() * 3) | 0)) % base.length], x0 = off + k * w / 2;
       for (const sh of [0, -w]) { g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(x0 + sh, r * rh, w / 2, rh); }
@@ -262,27 +263,69 @@ const T_wifi = tex(256, 300, (g, w, h) => {
   g.fillStyle = '#2d3238'; g.beginPath(); g.arc(150, 175, 9, 0, 7); g.fill();
   g.fillRect(52, 138, 26, 8); g.beginPath(); g.arc(46, 142, 9, 0, 7); g.fill();
 });
-const T_facade = tex(256, 512, (g, w, h) => {
-  g.fillStyle = '#d8cdb8'; g.fillRect(0, 0, w, h);
-  for (let r = 0; r < 8; r++) for (let c = 0; c < 4; c++) { g.fillStyle = '#efe8da'; g.fillRect(c * 64 + 6, r * 64 + 40, 52, 6); g.fillStyle = rnd() > 0.3 ? '#8d98a0' : '#a89e8c'; g.fillRect(c * 64 + 18, r * 64 + 12, 26, 24); }
+const T_facade = tex(256, 512, (g, w, h) => {   // واجهة عمارة: بلكونات + شبابيك + تكييفات
+  g.fillStyle = '#d9cfbb'; g.fillRect(0, 0, w, h); mottle(g, 0, 0, w, h, 60, ['#cfc4ad', '#e3dac8', '#c8bca5'], 0.08);
+  for (let r = 0; r < 8; r++) { const y = r * 64;
+    g.fillStyle = '#efe9db'; g.fillRect(0, y + 58, w, 6);                       // بلاطة الدور
+    for (let c = 0; c < 4; c++) { const x = c * 64;
+      if ((c + r) % 2 === 0) {                                                  // بلكونة
+        g.fillStyle = '#6f7b84'; g.fillRect(x + 8, y + 10, 48, 30);
+        g.fillStyle = '#93a0a8'; g.fillRect(x + 10, y + 12, 20, 26);
+        g.fillStyle = '#e9e3d5'; g.fillRect(x + 4, y + 40, 56, 18);
+        g.strokeStyle = '#b9b2a2'; g.lineWidth = 1; for (let i = 0; i < 7; i++) { g.beginPath(); g.moveTo(x + 6 + i * 9, y + 41); g.lineTo(x + 6 + i * 9, y + 57); g.stroke(); }
+      } else {                                                                  // شباك
+        g.fillStyle = '#f1ece0'; g.fillRect(x + 14, y + 12, 36, 34);
+        g.fillStyle = rnd() > 0.25 ? '#74828c' : '#c9b98f'; g.fillRect(x + 17, y + 15, 30, 28);
+        g.fillStyle = '#f1ece0'; g.fillRect(x + 31, y + 15, 2, 28);
+        if (rnd() > 0.55) { g.fillStyle = '#e6e6e2'; g.fillRect(x + 20, y + 47, 22, 9); g.fillStyle = '#9a9a96'; g.fillRect(x + 23, y + 49, 16, 5); }   // تكييف
+      } } }
 });
+
+// ---- خرايط بروز (bump): فواصل السيراميك والخشب + ملمس الدهان — عشان الأسطح متبقاش مسطحة زي الألعاب
+function gridBump(w, h, xs, ys, lw = 3, noise = 0) {
+  return tex(w, h, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < noise; i++) { g.fillStyle = rnd() > 0.5 ? '#000' : '#fff'; g.globalAlpha = 0.03 + rnd() * 0.05; const r = 2 + rnd() * 9; g.beginPath(); g.arc(rnd() * w, rnd() * h, r, 0, 7); g.fill(); }
+    g.globalAlpha = 1; g.strokeStyle = '#3a3a3a'; g.lineWidth = lw;
+    for (const x of xs) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+    for (const y of ys) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); } });
+}
+const T_porcB = gridBump(512, 512, [0, 256, 512], [0, 256, 512], 4, 500);
+const T_kfloorB = gridBump(256, 256, [0, 128, 256], [0, 128, 256], 4, 200);
+const T_bfloorB = gridBump(256, 256, [0, 128, 256], [0, 128, 256], 3, 200);
+const T_bwallB = gridBump(256, 512, [0, 128, 256], [0, 256, 512], 3, 0);
+const T_mandalaB = gridBump(384, 384, [0, 192, 384], [0, 384], 3, 0);
+const T_kwallB = (() => { const hpx = Math.round(H * KPX), ys = []; for (let y = 0; y <= H + 0.01; y += 0.30) ys.push(hpx - y * KPX);
+  for (let r = 0; r <= 4; r++) ys.push(hpx - BAND1 * KPX + r * 48);
+  return gridBump(480, hpx, [0, 240, 480], ys, 3, 0); })();
+const T_woodB = tex(2048, 512, (g, w, h) => { const rows = 6, rh = h / rows; g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 900; i++) { g.strokeStyle = rnd() > 0.5 ? '#000' : '#fff'; g.globalAlpha = 0.04 + rnd() * 0.07; g.lineWidth = 0.6 + rnd() * 1.6; const y = rnd() * h, x = rnd() * w, len = 60 + rnd() * 400; g.beginPath(); g.moveTo(x, y); g.lineTo(x + len, y + (rnd() - .5) * 3); g.stroke(); }
+  g.globalAlpha = 1; g.strokeStyle = '#2a2a2a'; g.lineWidth = 3;
+  for (let r = 0; r < rows; r++) { g.beginPath(); g.moveTo(0, r * rh + 0.5); g.lineTo(w, r * rh + 0.5); g.stroke();
+    for (let k = 0; k < 2; k++) for (const sh of [0, -w]) { const x = (woodOffs[r] || 0) + k * w / 2 + sh; g.beginPath(); g.moveTo(x, r * rh); g.lineTo(x, (r + 1) * rh); g.stroke(); } } });
+const T_plaster = tex(256, 256, (g, w, h) => { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 5200; i++) { g.fillStyle = rnd() > 0.5 ? '#000' : '#fff'; g.globalAlpha = 0.04 + rnd() * 0.10; const r = 0.6 + rnd() * 2.4; g.beginPath(); g.arc(rnd() * w, rnd() * h, r, 0, 7); g.fill(); }
+  for (let i = 0; i < 90; i++) { g.fillStyle = rnd() > 0.5 ? '#000' : '#fff'; g.globalAlpha = 0.03 + rnd() * 0.04; const r = 10 + rnd() * 30; g.beginPath(); g.arc(rnd() * w, rnd() * h, r, 0, 7); g.fill(); } });
+function uvBox(g, w, h, d) {   // UV بالمتر لصناديق الحيطان عشان ملمس الدهان يبقى بمقياس ثابت
+  const uv = g.attributes.uv, dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+  for (let f = 0; f < 6; f++) for (let i = 0; i < 4; i++) { const k = f * 4 + i; uv.setXY(k, uv.getX(k) * dims[f][0], uv.getY(k) * dims[f][1]); }
+}
 
 /* =====================================================================
    materials
    ===================================================================== */
 const S = (o) => new THREE.MeshStandardMaterial(o);
 const M = {
-  paint:   S({ color: 0xebe8e0, roughness: 0.93 }),
+  paint:   S({ color: 0xebe8e0, roughness: 0.93, bumpMap: T_plaster, bumpScale: 0.55 }),
   ceil:    S({ color: 0xf7f6f2, roughness: 0.95, side: THREE.DoubleSide }),
   corn:    S({ color: 0xffffff, roughness: 0.8 }),
   ext:     S({ color: 0xe6dccb, roughness: 0.95 }),
-  porc:    S({ map: T_porc, roughness: 0.55 }),
-  wood:    S({ map: T_wood, roughness: 0.5 }),
-  kfloor:  S({ map: T_kfloor, roughness: 0.45 }),
-  bfloor:  S({ map: T_bfloor, roughness: 0.5 }),
-  kwall:   S({ map: T_kwall, roughness: 0.35 }),
-  bwall:   S({ map: T_bwall, roughness: 0.3 }),
-  mandala: S({ map: T_mandala, roughness: 0.35 }),
+  porc:    S({ map: T_porc, roughness: 0.46, bumpMap: T_porcB, bumpScale: 1.4 }),
+  wood:    S({ map: T_wood, roughness: 0.48, bumpMap: T_woodB, bumpScale: 1.2 }),
+  kfloor:  S({ map: T_kfloor, roughness: 0.42, bumpMap: T_kfloorB, bumpScale: 1.3 }),
+  bfloor:  S({ map: T_bfloor, roughness: 0.45, bumpMap: T_bfloorB, bumpScale: 1.3 }),
+  kwall:   S({ map: T_kwall, roughness: 0.3, bumpMap: T_kwallB, bumpScale: 1.3 }),
+  bwall:   S({ map: T_bwall, roughness: 0.28, bumpMap: T_bwallB, bumpScale: 1.3 }),
+  mandala: S({ map: T_mandala, roughness: 0.3, bumpMap: T_mandalaB, bumpScale: 1.2 }),
   pebble:  S({ map: T_pebble, roughness: 0.8 }),
   skWood:  S({ color: 0xa57f54, roughness: 0.6 }),
   skTile:  S({ color: 0xb9ab95, roughness: 0.5 }),
@@ -323,7 +366,7 @@ function B(x0, x1, y0, y1, z0, z1, mat, parent = scene) {
 }
 const P = (wall, s0, s1, y0, y1, t0, t1, mat) => wall === 'x' ? B(s0, s1, y0, y1, t0, t1, mat) : B(t0, t1, y0, y1, s0, s1, mat);
 function solid(x0, x1, y0, y1, z0, z1, mat, collide = true) {
-  B(x0, x1, y0, y1, z0, z1, mat);
+  uvBox(B(x0, x1, y0, y1, z0, z1, mat).geometry, Math.abs(x1 - x0), Math.abs(y1 - y0), Math.abs(z1 - z0));
   if (collide && y0 < 1.6 && y1 > 0.25) colliders.push({ x0: Math.min(x0, x1), x1: Math.max(x0, x1), z0: Math.min(z0, z1), z1: Math.max(z0, z1) });
 }
 // حيطة بطول X (السُمك z0..z1) أو بطول Z (السُمك x0..x1) مع فتحات {a,b,y0,y1}
