@@ -43,6 +43,11 @@
   #penbar .sw{width:34px;height:34px;border-radius:50%;padding:0;font-weight:700;font-size:12px}
   #penbar .on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
   .touch #tbtn button{width:52px;height:52px}
+  #qbar{position:fixed;left:12px;top:204px;display:flex;flex-direction:column;gap:6px;z-index:4}
+  #qbar button{font:inherit;font-size:18px;line-height:1.1;width:62px;padding:6px 2px;border-radius:10px;border:2px solid #555;background:rgba(18,18,18,.8);color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+  #qbar small{font-size:9.5px;color:#ccc;white-space:nowrap}
+  #qbar .on{border-color:#ffd58a;background:#3a2f18}
+  @media (max-width:700px){ #qbar{top:122px} #qbar button{width:50px;font-size:16px} #qbar small{display:none} }
 </style>
 </head>
 <body>
@@ -52,7 +57,7 @@
 <div id="help">
   <kbd>W</kbd><kbd>S</kbd> / <kbd>↑</kbd><kbd>↓</kbd> مشي &nbsp; <kbd>A</kbd><kbd>D</kbd> جنب &nbsp; <kbd>←</kbd><kbd>→</kbd> لف<br>
   الماوس: بص حواليك (كليك أو اسحب) &nbsp; <kbd>Shift</kbd> جري<br>
-  <kbd>E</kbd> افتح/اقفل باب أو لوحة &nbsp; <kbd>L</kbd> النور &nbsp; <kbd>M</kbd> الخريطة &nbsp; <kbd>R</kbd> ارجع لباب الشقة &nbsp; <kbd>T</kbd> شات &nbsp; <kbd>P</kbd> قلم الرسم &nbsp; <kbd>-</kbd><kbd>+</kbd> زاوية الرؤية
+  <kbd>E</kbd> افتح/اقفل باب أو لوحة &nbsp; <kbd>L</kbd> النور &nbsp; <kbd>M</kbd> الخريطة &nbsp; <kbd>R</kbd> ارجع لباب الشقة &nbsp; <kbd>T</kbd> شات &nbsp; <kbd>P</kbd> قلم &nbsp; <kbd>X</kbd> ممحاة &nbsp; <kbd>Del</kbd> مسح كل الرسم &nbsp; <kbd>-</kbd><kbd>+</kbd> زاوية الرؤية
 </div>
 <div id="hint"></div>
 <div id="cross"></div>
@@ -60,7 +65,8 @@
 <div id="chatlog"></div><input id="chatin" maxlength="200" placeholder="اكتب رسالة واضغط Enter">
 <div id="stick"><div id="knob"></div></div>
 <div id="penbar"></div>
-<div id="tbtn"><button id="bP">✏️</button><button id="bC">💬</button><button id="bL">💡</button><button id="bE">E</button></div>
+<div id="qbar"><button id="qP">✏️<small>قلم P</small></button><button id="qX">🧽<small>ممحاة X</small></button><button id="qD">🗑️<small>مسح الكل Del</small></button><button id="qS">🔊<small>صوت</small></button></div>
+<div id="tbtn"><button id="bC">💬</button><button id="bL">💡</button><button id="bE">E</button></div>
 <div id="err"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
@@ -101,6 +107,10 @@ renderer.toneMappingExposure = 0.92;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xbfd9ee);
+{ const cv = document.createElement('canvas'); cv.width = 8; cv.height = 256; const g = cv.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256);
+  gr.addColorStop(0, '#5f9bd6'); gr.addColorStop(0.38, '#a9cdea'); gr.addColorStop(0.5, '#e3eef5'); gr.addColorStop(0.56, '#d5d6cf'); gr.addColorStop(1, '#b9b3a6'); g.fillStyle = gr; g.fillRect(0, 0, 8, 256);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace;
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(240, 24, 16), new THREE.MeshBasicMaterial({ map: t, side: THREE.BackSide, toneMapped: false, fog: false })); sky.userData.nc = true; sky.userData.nh = true; scene.add(sky); }
 const camera = new THREE.PerspectiveCamera(78, innerWidth / innerHeight, 0.04, 300);
 camera.rotation.order = 'YXZ';
 
@@ -445,6 +455,8 @@ function door(o) {
     if (wl === 'x') { pivot.position.set(hs, 0, ft); base = L.hinge === 'a' ? 0 : Math.PI; sgn = L.hinge === 'a' ? -o.swing : o.swing; }
     else { pivot.position.set(ft, 0, hs); base = L.hinge === 'a' ? -Math.PI / 2 : Math.PI / 2; sgn = L.hinge === 'a' ? o.swing : -o.swing; }
     pivot.add(o.kind === 'wood' ? woodLeaf(clear, lh) : aluLeaf(clear, lh, o.kind));
+    if (o.peep) for (const sd of [-1, 1]) { const pe = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.008, 12), M.brass); pe.rotation.x = Math.PI / 2; pe.position.set(clear / 2, 1.52, sd * 0.024); pivot.add(pe);
+      const lk = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.017, 0.012, 12), M.brass); lk.rotation.x = Math.PI / 2; lk.position.set(clear - 0.065, 1.28, sd * 0.026); pivot.add(lk); }   // عين سحرية + كالون إضافي
     const t0 = o.open ? 1 : 0;
     pivot.userData = { base, amp: sgn * THREE.MathUtils.degToRad(o.deg || 90), t: t0, target: t0 };
     pivot.rotation.y = base + pivot.userData.amp * t0;
@@ -507,6 +519,7 @@ const LOW = 0.40, SWH = 1.25;
 
 // ---------- إنارة (لمبة سقف) ----------
 const lamps = [];
+const T_glow = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const g = cv.getContext('2d'), gr = g.createRadialGradient(64, 64, 2, 64, 64, 62); gr.addColorStop(0, 'rgba(255,246,220,1)'); gr.addColorStop(0.25, 'rgba(255,236,190,0.45)'); gr.addColorStop(1, 'rgba(255,230,170,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(cv); })();
 function bulb(x, z, intensity = 3.2, y = H) {
   const g = new THREE.Group();
   const rose = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.025, 20), M.white); rose.position.y = -0.0125; g.add(rose);
@@ -515,7 +528,8 @@ function bulb(x, z, intensity = 3.2, y = H) {
   const glass = new THREE.Mesh(new THREE.SphereGeometry(0.036, 16, 12), M.bulbOn.clone()); glass.scale.y = 1.25; glass.position.y = -0.14; g.add(glass);
   g.position.set(x, y, z); scene.add(g);
   const L = new THREE.PointLight(0xfff6e8, intensity, 9, 1.7); L.position.set(x, y - 0.22, z); scene.add(L);
-  lamps.push({ L, glass, I: intensity });
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: T_glow, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.6 })); glow.scale.set(0.5, 0.5, 1); glow.position.set(x, y - 0.14, z); scene.add(glow);
+  lamps.push({ L, glass, I: intensity, glow });
 }
 
 /* =====================================================================
@@ -575,6 +589,8 @@ wall('x', 3.95, 10.16, 7.77, 7.97, [WIN.bed, WIN.office]);                      
 wall('z', 6.58, 7.85, 13.91, 14.06);                                                       // شرق التراس
 solid(10.31, 13.91, 0, 1.00, 7.73, 7.85, M.paint);                                         // سور التراس
 B(10.31, 13.91, 1.00, 1.04, 7.71, 7.87, M.corn);
+{ const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 3.6, 12), M.steel); rail.rotation.z = Math.PI / 2; rail.position.set(12.11, 1.14, 7.79); scene.add(rail);   // درابزين التراس
+  for (const px of [10.40, 11.25, 12.11, 12.97, 13.82]) B(px - 0.012, px + 0.012, 1.04, 1.13, 7.778, 7.802, M.steel); }
 solid(6.29, 6.41, 0, 1.10, -0.09, 1.07, M.paint); solid(6.41, 7.61, 0, 1.10, -0.09, 0.03, M.paint); // سور بلكونة المطبخ
 B(6.27, 6.43, 1.10, 1.14, -0.11, 1.07, M.corn); B(6.43, 7.61, 1.10, 1.14, -0.11, 0.05, M.corn);
 // بسطة السلم برا
@@ -634,7 +650,7 @@ trims(R.office, { skirt: M.skWood, gaps: { N: [gp(D.office)] } });
 /* =====================================================================
    الأبواب
    ===================================================================== */
-door({ wall: 'x', ...D.entrance, c0: -0.17, c1: 0.03, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 100, label: 'باب الشقة' });
+door({ wall: 'x', ...D.entrance, c0: -0.17, c1: 0.03, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 100, label: 'باب الشقة', peep: true });
 door({ wall: 'x', ...D.kitchen,  c0: 3.05, c1: 3.20, hinge: 'b', swing: -1, kind: 'wood', open: true, deg: 90,  label: 'باب المطبخ', sill: M.kfloor });
 door({ wall: 'x', ...D.bath,     c0: 3.05, c1: 3.20, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 168, label: 'باب الحمام', sill: M.bfloor });
 door({ wall: 'x', ...D.bed,      c0: 4.20, c1: 4.35, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 88,  label: 'باب أوضة النوم' });
@@ -742,6 +758,8 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
   const kn = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.03, 10), M.chrome); kn.position.set(x0 + 0.03, 1.15, z0 + 0.26); scene.add(kn);
   colliders.push({ x0: R.kit.x0, x1: R.kit.x0 + d, z0, z1 });
   const hook = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.07, 6), M.dark); hook.rotation.x = Math.PI / 2; hook.position.set(8.2, 2.2, 0.03 + 0.035); scene.add(hook);
+  { const v1 = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.05, 10), M.chrome); v1.rotation.z = Math.PI / 2; v1.position.set(x0 + 0.025, 0.40, 0.89); scene.add(v1);
+    const v2 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.014, 12), M.chrome); v2.rotation.z = Math.PI / 2; v2.position.set(x0 + 0.055, 0.40, 0.89); scene.add(v2); }   // محبس جنب باب البلكونة
 }
 
 /* =====================================================================
@@ -872,7 +890,7 @@ let lightsOn = true, nearIt = null;
 const fovEl = document.getElementById('fov'); fovEl.textContent = camera.fov.toFixed(0);
 const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 function begin() { startEl.style.display = 'none'; }
-function toggleLights() { lightsOn = !lightsOn; for (const l of lamps) { l.L.intensity = lightsOn ? l.I : 0; l.glass.material.color.set(lightsOn ? 0xfff4d6 : 0x9a9a94); } }
+function toggleLights() { lightsOn = !lightsOn; for (const l of lamps) { l.L.intensity = lightsOn ? l.I : 0; l.glass.material.color.set(lightsOn ? 0xfff4d6 : 0x9a9a94); if (l.glow) l.glow.visible = lightsOn; } }
 addEventListener('keydown', e => {
   if (startEl.style.display !== 'none' || typing()) return;
   if (e.code === 'KeyT' || e.code === 'Enter') { e.preventDefault(); chatOpen(); return; }
@@ -881,7 +899,9 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyE' || e.code === 'Space') useNearest();
   if (e.code === 'KeyL') toggleLights();
   if (e.code === 'KeyP') penToggle();
-  if (PEN.on) { const di = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6'].indexOf(e.code); if (di >= 0) penColor(PEN_COLORS[di]); if (e.code === 'KeyX') penErase(!PEN.erase); if (e.code === 'Delete') strokesClearAll(); }
+  if (PEN.on) { const di = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6'].indexOf(e.code); if (di >= 0) penColor(PEN_COLORS[di]); }
+  if (e.code === 'KeyX') eraserKey();
+  if (e.code === 'Delete') strokesClearAll();
   if (e.code === 'KeyM') mapEl.style.display = mapEl.style.display === 'none' ? '' : 'none';
   if (['BracketLeft', 'BracketRight', 'Minus', 'Equal'].includes(e.code)) { camera.fov = Math.max(55, Math.min(100, camera.fov + ((e.code === 'BracketRight' || e.code === 'Equal') ? 3 : -3))); camera.updateProjectionMatrix(); fovEl.textContent = camera.fov.toFixed(0); }
   if (e.code === 'KeyR') { pl.x = START.x; pl.z = START.z; pl.yaw = START.yaw; pl.pitch = 0; }
@@ -901,13 +921,24 @@ addEventListener('mousemove', e => {   // pointer lock لو متاح ، وإلا
 });
 addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
 
+let AC = null, muted = false, walkPh = 0, bobA = 0;
+function audioInit() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) {} }
+function noiseBurst(dur, freq, q, gain) {
+  if (!AC || muted) return;
+  try { const n = (AC.sampleRate * dur) | 0, buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    const src = AC.createBufferSource(), bp = AC.createBiquadFilter(), gn = AC.createGain(); src.buffer = buf; bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = q; gn.gain.value = gain;
+    src.connect(bp); bp.connect(gn); gn.connect(AC.destination); src.start(); } catch (e) {}
+}
+const stepSound = wood => noiseBurst(0.09, wood ? 380 : 950, wood ? 1.4 : 0.8, wood ? 0.55 : 0.26);
+const doorSound = () => noiseBurst(0.14, 230, 2.2, 0.55);
 function useNearest() {
   if (!nearIt) return;
   for (const p of nearIt.pivots) {
     if (nearIt.cycle) { const i = nearIt.cycle.indexOf(p.userData.target); p.userData.target = nearIt.cycle[(i + 1) % nearIt.cycle.length]; }
     else p.userData.target = p.userData.target ? 0 : 1;
   }
-  netDoors();
+  netDoors(); doorSound();
 }
 const PR = 0.24;
 function collide() {
@@ -924,6 +955,7 @@ function collide() {
   }
 }
 function step(dt) {
+  const px0 = pl.x, pz0 = pl.z;
   const turn = (keys.ArrowLeft ? 1 : 0) - (keys.ArrowRight ? 1 : 0);
   pl.yaw += turn * 1.9 * dt;
   const f = ((keys.KeyW || keys.ArrowUp) ? 1 : 0) - ((keys.KeyS || keys.ArrowDown) ? 1 : 0) + joy.f, s = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0) + joy.s, mag = Math.hypot(f, s);
@@ -934,7 +966,10 @@ function step(dt) {
     for (let i = 0; i < n; i++) { pl.x += mx / n; pl.z += mz / n; collide(); }
   }
   for (const p of pivots) { const u = p.userData; if (u.t !== u.target) { shDirty = 2; const dlt = Math.sign(u.target - u.t) * dt * 1.8; u.t = Math.abs(u.target - u.t) <= Math.abs(dlt) ? u.target : u.t + dlt; if (u.slide) p.position[u.slide.axis] = u.slide.from + (u.slide.to - u.slide.from) * u.t; else p.rotation.y = u.base + u.amp * u.t; } }
-  camera.position.set(pl.x, EYE, pl.z); camera.rotation.set(pl.pitch, pl.yaw, 0);
+  { const mvd = Math.hypot(pl.x - px0, pl.z - pz0), on = mvd > 1e-4 && mvd < 0.5;
+    if (on) { const pv = walkPh; walkPh += mvd * 9; if (Math.floor(walkPh / 6.2832) !== Math.floor(pv / 6.2832)) stepSound(curRoom === 'master' || curRoom === 'bed' || curRoom === 'office'); }
+    bobA += ((on ? 1 : 0) - bobA) * Math.min(1, dt * 8); }
+  camera.position.set(pl.x, EYE + Math.sin(walkPh) * 0.011 * bobA, pl.z); camera.rotation.set(pl.pitch, pl.yaw, 0);
   // أقرب حاجة تتفتح
   nearIt = null; let best = 1.9;
   for (const it of interact) { const d = Math.hypot(it.x - pl.x, it.z - pl.z); if (d < best) { best = d; nearIt = it; } }
@@ -960,76 +995,96 @@ function labelSprite(text, bg = 'rgba(20,20,20,0.78)', fg = '#fff') {
   g.fillStyle = fg; g.fillText(text, 256, 66, 480);
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace;
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
-  sp.scale.set(1.0, 0.25, 1); sp.renderOrder = 5; return sp;
+  sp.scale.set(0.8, 0.2, 1); sp.renderOrder = 5; return sp;
 }
-function makeAvatar(name, g) {   // شخص من primitives (Capsule / Lathe / Sphere) بمفاصل بتتحرك — وشّه ناحية -Z
+const lathe = (pts, seg = 22) => new THREE.LatheGeometry(pts.map(p => new THREE.Vector2(p[0], p[1])), seg);
+const T_blob = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const g = cv.getContext('2d'), gr = g.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, 'rgba(0,0,0,0.42)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.18)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(cv); })();
+function makeAvatar(name, g) {   // شخص بتفاصيل (Lathe / Capsule / Sphere / Torus) بمفاصل بتتحرك — وشّه ناحية -Z
   const f = g === 'f', grp = new THREE.Group(), U = grp.userData;
   let hsh = 7; for (const ch of name) hsh = (hsh * 31 + ch.codePointAt(0)) >>> 0;
   const pick = (a, s = 0) => a[((hsh >>> s) & 0xffff) % a.length];
-  const skin = S({ color: pick([0xe8b98f, 0xd9a47a, 0xc98f63, 0xf0c8a0, 0xb97f55], 3), roughness: 0.62 });
-  const top = S({ color: f ? pick([0xc9477f, 0x8e5bb5, 0x2e9c94, 0xe6d3b8, 0xd4634a, 0x4a6fb5]) : pick([0x2f62b8, 0x3a7d5c, 0x8a8f98, 0xf1efe8, 0x7a3b3b, 0x26313f]), roughness: 0.85, side: THREE.DoubleSide });
-  const bottom = S({ color: f ? pick([0x2d2f45, 0x3b2f2a, 0x59607a], 5) : pick([0x23272f, 0x3a4660, 0x4b3f33], 5), roughness: 0.9 });
-  const hairM = S({ color: pick([0x1c130d, 0x2b1b12, 0x3a2516, 0x120d0a], 7), roughness: 0.8 });
-  const shoe = S({ color: f ? 0xe9e4da : 0x1c1c1e, roughness: 0.55 }), white = S({ color: 0xf5f5f2, roughness: 0.35 }), lip = S({ color: f ? 0xb0504f : 0x9a5a4c, roughness: 0.6 });
+  const topC = f ? pick([0xc9477f, 0x8e5bb5, 0x2e9c94, 0xe6d3b8, 0xd4634a, 0x4a6fb5]) : pick([0x2f62b8, 0x3a7d5c, 0x8a8f98, 0xf1efe8, 0x7a3b3b, 0x26313f]);
+  const skin = S({ color: pick([0xe8b98f, 0xd9a47a, 0xc98f63, 0xf0c8a0, 0xb97f55], 3), roughness: 0.55 });
+  const top = S({ color: topC, roughness: 0.9, side: THREE.DoubleSide }), topD = S({ color: new THREE.Color(topC).multiplyScalar(0.7), roughness: 0.9 });
+  const bottom = S({ color: f ? pick([0x2d2f45, 0x3b2f2a, 0x59607a], 5) : pick([0x23272f, 0x3a4660, 0x4b3f33], 5), roughness: 0.92 });
+  const hairM = S({ color: pick([0x1c130d, 0x2b1b12, 0x3a2516, 0x120d0a], 7), roughness: 0.75 });
+  const shoe = S({ color: f ? 0xd9d2c4 : 0x26221f, roughness: 0.5 }), sole = S({ color: f ? 0xf2efe8 : 0xe9e6de, roughness: 0.7 }), white = S({ color: 0xf6f6f3, roughness: 0.3 });
+  const iris = S({ color: pick([0x3b2a1a, 0x4a3523, 0x2f3d2a, 0x39485a], 9), roughness: 0.25 }), lip = S({ color: f ? 0xb4504f : 0x9a5d4e, roughness: 0.55 }), belt = S({ color: 0x1a1512, roughness: 0.45 });
   const mesh = (geo, mat, par, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; par.add(m); return m; };
-  const body = new THREE.Group(); body.scale.setScalar(f ? 0.945 : 1); grp.add(body); U.body = body;
-  // ---- الرجلين: ورك → ركبة → قدم
+  const blob = new THREE.Mesh(new THREE.CircleGeometry(0.36, 24), new THREE.MeshBasicMaterial({ map: T_blob, transparent: true, depthWrite: false, toneMapped: false }));
+  blob.rotation.x = -Math.PI / 2; blob.position.y = 0.007; blob.renderOrder = 1; grp.add(blob);                 // ظل تحت الرجلين
+  const body = new THREE.Group(); body.scale.setScalar(f ? 0.94 : 1); grp.add(body); U.body = body;
+  // ---- الرجلين: فخد → ركبة → سمانة → جزمة
   U.hip = []; U.knee = [];
   for (const sx of [-1, 1]) {
-    const hip = new THREE.Group(); hip.position.set(sx * 0.092, 0.93, 0); body.add(hip); U.hip.push(hip);
-    mesh(new THREE.CapsuleGeometry(f ? 0.07 : 0.078, 0.30, 6, 14), bottom, hip, 0, -0.215, 0);
-    const knee = new THREE.Group(); knee.position.set(0, -0.44, 0); hip.add(knee); U.knee.push(knee);
-    mesh(new THREE.CapsuleGeometry(f ? 0.052 : 0.06, 0.30, 6, 14), bottom, knee, 0, -0.20, 0);
-    const foot = mesh(new THREE.CapsuleGeometry(0.045, 0.15, 6, 12), shoe, knee, 0, -0.445, -0.055); foot.rotation.x = Math.PI / 2; foot.scale.set(1.05, 1, 0.8);
+    const hip = new THREE.Group(); hip.position.set(sx * 0.09, 0.94, 0); body.add(hip); U.hip.push(hip);
+    mesh(lathe([[0, 0.03], [0.07, 0.02], [f ? 0.083 : 0.086, -0.05], [0.078, -0.20], [0.061, -0.38], [0.057, -0.45]]), bottom, hip);
+    const knee = new THREE.Group(); knee.position.set(0, -0.45, 0); hip.add(knee); U.knee.push(knee);
+    mesh(new THREE.SphereGeometry(0.058, 14, 10), bottom, knee);
+    mesh(lathe([[0.057, 0], [f ? 0.058 : 0.064, -0.12], [0.05, -0.26], [0.043, -0.37], [f ? 0.044 : 0.054, -0.41]]), bottom, knee);
+    const up = mesh(new THREE.CapsuleGeometry(0.047, 0.14, 6, 12), shoe, knee, 0, -0.432, -0.05); up.rotation.x = Math.PI / 2; up.scale.set(1, 1, 0.8);
+    mesh(new THREE.BoxGeometry(0.096, 0.022, 0.265), sole, knee, 0, -0.474, -0.05);
   }
-  // ---- الجسم
-  const prof = (f ? [[0.150, 0.86], [0.172, 0.93], [0.160, 1.00], [0.128, 1.10], [0.150, 1.22], [0.170, 1.31], [0.168, 1.38], [0.120, 1.44], [0.055, 1.47]]
-                  : [[0.150, 0.86], [0.165, 0.93], [0.160, 1.02], [0.158, 1.12], [0.180, 1.24], [0.200, 1.34], [0.195, 1.40], [0.130, 1.455], [0.058, 1.48]]).map(p => new THREE.Vector2(p[0], p[1]));
-  mesh(new THREE.LatheGeometry(prof, 26), top, body).scale.z = 0.64;
-  mesh(new THREE.SphereGeometry(0.16, 18, 12), bottom, body, 0, 0.90, 0).scale.set(1.02, 0.55, 0.66);
-  if (f) mesh(new THREE.LatheGeometry([[0.170, 0.95], [0.190, 0.82], [0.205, 0.70]].map(p => new THREE.Vector2(p[0], p[1])), 26), top, body).scale.z = 0.72;   // بلوزة طويلة
+  // ---- الجسم + الحزام + الياقة
+  mesh(lathe(f ? [[0, 0.84], [0.14, 0.85], [0.176, 0.93], [0.162, 1.00], [0.128, 1.10], [0.150, 1.21], [0.168, 1.30], [0.166, 1.375], [0.125, 1.43], [0.06, 1.46], [0.045, 1.49]]
+                 : [[0, 0.84], [0.13, 0.85], [0.165, 0.92], [0.162, 1.00], [0.158, 1.10], [0.176, 1.22], [0.198, 1.33], [0.196, 1.395], [0.15, 1.445], [0.07, 1.475], [0.05, 1.50]], 28), top, body).scale.z = 0.62;
+  mesh(new THREE.SphereGeometry(0.16, 18, 12), bottom, body, 0, 0.90, 0).scale.set(1.02, 0.55, 0.64);
+  if (f) mesh(lathe([[0.176, 0.93], [0.195, 0.80], [0.21, 0.66]], 28), top, body).scale.z = 0.70;                 // بلوزة طويلة
+  else { const bl = mesh(new THREE.TorusGeometry(0.159, 0.013, 8, 28), belt, body, 0, 0.955, 0); bl.rotation.x = Math.PI / 2; bl.scale.set(1, 0.63, 1); mesh(new THREE.BoxGeometry(0.04, 0.03, 0.012), M.steel, body, 0, 0.955, -0.104); }
+  const col = mesh(new THREE.TorusGeometry(0.056, 0.012, 8, 20), topD, body, 0, 1.487, 0); col.rotation.x = Math.PI / 2;
   // ---- الدراعات: كتف → كوع → إيد
   U.sh = []; U.el = [];
   for (const sx of [-1, 1]) {
-    const sh = new THREE.Group(); sh.position.set(sx * (f ? 0.185 : 0.215), 1.385, 0); sh.rotation.z = sx * 0.07; body.add(sh); U.sh.push(sh);
-    mesh(new THREE.SphereGeometry(0.058, 14, 10), top, sh);
-    mesh(new THREE.CapsuleGeometry(f ? 0.04 : 0.047, 0.21, 6, 12), top, sh, 0, -0.15, 0);
-    const el = new THREE.Group(); el.position.set(0, -0.30, 0); el.rotation.x = 0.18; sh.add(el); U.el.push(el);
-    mesh(new THREE.CapsuleGeometry(f ? 0.034 : 0.04, 0.19, 6, 12), f ? top : skin, el, 0, -0.125, 0);
-    mesh(new THREE.SphereGeometry(0.043, 12, 10), skin, el, 0, -0.275, 0).scale.set(0.75, 1.15, 0.5);
+    const sh = new THREE.Group(); sh.position.set(sx * (f ? 0.168 : 0.205), 1.39, 0); sh.rotation.z = sx * 0.06; body.add(sh); U.sh.push(sh);
+    mesh(new THREE.SphereGeometry(0.052, 14, 10), top, sh);
+    mesh(lathe([[0.052, 0], [0.05, -0.10], [0.043, -0.27], [0.041, -0.30]], 14), f ? top : skin, sh);
+    if (!f) mesh(lathe([[0.059, 0.02], [0.057, -0.14], [0.059, -0.17]], 14), top, sh);                              // كُم قصير
+    const el = new THREE.Group(); el.position.set(0, -0.30, 0); el.rotation.x = 0.2; sh.add(el); U.el.push(el);
+    mesh(new THREE.SphereGeometry(0.042, 12, 10), f ? top : skin, el);
+    mesh(lathe([[0.041, 0], [0.04, -0.08], [0.03, -0.24], [0.029, -0.26]], 14), f ? top : skin, el);
+    if (f) { const cf = mesh(new THREE.TorusGeometry(0.031, 0.006, 6, 14), topD, el, 0, -0.25, 0); cf.rotation.x = Math.PI / 2; }
+    const hand = new THREE.Group(); hand.position.set(0, -0.275, 0); el.add(hand);
+    mesh(new THREE.SphereGeometry(0.04, 12, 10), skin, hand).scale.set(0.45, 1.1, 0.85);
+    mesh(new THREE.CapsuleGeometry(0.02, 0.045, 4, 8), skin, hand, 0, -0.062, -0.004).scale.set(0.5, 1, 1.45);
+    const th = mesh(new THREE.CapsuleGeometry(0.011, 0.03, 4, 8), skin, hand, 0, -0.018, -0.036); th.rotation.x = -0.6;
   }
-  // ---- الرقبة والراس والوش
-  mesh(new THREE.CylinderGeometry(0.048, 0.055, 0.09, 14), skin, body, 0, 1.50, 0);
-  const head = new THREE.Group(); head.position.set(0, 1.635, 0); body.add(head); U.head = head;
-  mesh(new THREE.SphereGeometry(0.108, 28, 22), skin, head).scale.set(0.93, 1.13, 1.0);
-  mesh(new THREE.SphereGeometry(0.07, 16, 12), skin, head, 0, -0.065, -0.02).scale.set(1.0, 0.8, 1.0);
+  // ---- الرقبة والراس
+  mesh(new THREE.CylinderGeometry(0.046, 0.052, 0.10, 14), skin, body, 0, 1.515, 0);
+  const head = new THREE.Group(); head.position.set(0, 1.665, 0); body.add(head); U.head = head;
+  mesh(lathe([[0, -0.128], [0.035, -0.122], [0.062, -0.10], [0.082, -0.06], [0.095, -0.01], [0.099, 0.035], [0.093, 0.08], [0.07, 0.115], [0.035, 0.133], [0, 0.138]], 30), skin, head, 0, 0, -0.004).scale.set(0.93, 1, 1.1);
+  U.lids = [];
   for (const sx of [-1, 1]) {
-    mesh(new THREE.SphereGeometry(0.022, 10, 8), skin, head, sx * 0.099, -0.005, 0.005).scale.set(0.45, 1, 0.7);
-    mesh(new THREE.SphereGeometry(0.0155, 12, 10), white, head, sx * 0.038, 0.012, -0.094).scale.set(1.25, 0.8, 0.6);
-    mesh(new THREE.SphereGeometry(0.0085, 10, 8), M.dark, head, sx * 0.038, 0.012, -0.103).scale.z = 0.5;
-    mesh(new THREE.BoxGeometry(0.034, 0.006, 0.008), hairM, head, sx * 0.038, 0.04, -0.099).rotation.z = -sx * 0.12;
+    mesh(new THREE.SphereGeometry(0.022, 10, 8), skin, head, sx * 0.093, 0.0, 0.006).scale.set(0.45, 1, 0.7);                         // ودان
+    mesh(new THREE.SphereGeometry(0.0165, 14, 10), white, head, sx * 0.037, 0.018, -0.088).scale.set(1.2, 0.85, 0.6);                 // عين
+    mesh(new THREE.SphereGeometry(0.0085, 12, 8), iris, head, sx * 0.037, 0.018, -0.0985).scale.z = 0.45;
+    mesh(new THREE.SphereGeometry(0.0045, 8, 6), M.dark, head, sx * 0.037, 0.018, -0.1022).scale.z = 0.4;
+    const lid = mesh(new THREE.SphereGeometry(0.0185, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, head, sx * 0.037, 0.018, -0.088); lid.scale.set(1.22, 0.9, 0.66); lid.rotation.x = 0.15; U.lids.push(lid);
+    mesh(new THREE.BoxGeometry(0.034, 0.0065, 0.008), hairM, head, sx * 0.038, 0.047, -0.098).rotation.z = -sx * 0.1;                 // حاجب
   }
-  mesh(new THREE.ConeGeometry(0.013, 0.04, 8), skin, head, 0, -0.012, -0.108).rotation.x = -1.9;
-  mesh(new THREE.BoxGeometry(0.036, 0.007, 0.006), lip, head, 0, -0.058, -0.094);
-  mesh(new THREE.SphereGeometry(0.114, 26, 16, 0, Math.PI * 2, 0, Math.PI * 0.52), hairM, head, 0, 0.012, 0.012).scale.set(0.97, 1.15, 1.06);
-  if (f) {
-    mesh(new THREE.CapsuleGeometry(0.085, 0.20, 6, 14), hairM, head, 0, -0.13, 0.065).scale.set(1.15, 1, 0.55);
-    for (const sx of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.03, 0.16, 5, 10), hairM, head, sx * 0.093, -0.085, 0.012);
-  }
-  const lab = labelSprite(name, f ? 'rgba(170,40,110,0.85)' : 'rgba(30,90,190,0.85)'); lab.position.y = f ? 1.88 : 1.98; grp.add(lab);
-  U.lab = lab; U.nh = true; U.phase = 0; U.amp = 0;
+  mesh(new THREE.BoxGeometry(0.014, 0.04, 0.02), skin, head, 0, 0.002, -0.103).rotation.x = 0.25;                                      // مناخير
+  mesh(new THREE.SphereGeometry(0.014, 10, 8), skin, head, 0, -0.022, -0.112).scale.set(1.15, 0.8, 1);
+  const mo = mesh(new THREE.TorusGeometry(0.022, 0.0045, 6, 14, Math.PI * 0.7), lip, head, 0, -0.045, -0.095); mo.rotation.z = Math.PI + Math.PI * 0.15; mo.scale.y = 0.45;
+  { const cap = mesh(new THREE.SphereGeometry(0.116, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.5), hairM, head, 0, 0.035, 0.002); cap.scale.set(0.95, 1, 1.08); cap.rotation.x = 0.5; }   // الشعر (خط الشعر عند الجبهة ونازل على القفا)
+  if (f) mesh(lathe([[0, 0.13], [0.09, 0.10], [0.108, 0.02], [0.11, -0.10], [0.10, -0.22], [0.07, -0.30], [0, -0.31]], 24), hairM, head, 0, 0, 0.045).scale.set(1, 1, 0.6);
+  else mesh(new THREE.SphereGeometry(0.06, 14, 8), hairM, head, 0, 0.108, -0.058).scale.set(1.4, 0.4, 0.8);
+  const lab = labelSprite(name, f ? 'rgba(170,40,110,0.85)' : 'rgba(30,90,190,0.85)'); lab.position.y = f ? 1.87 : 1.97; grp.add(lab);
+  U.lab = lab; U.nh = true; U.phase = 0; U.amp = 0; U.t = Math.random() * 10; U.blink = 2 + Math.random() * 3; U.hp = 0;
   return grp;
 }
-function animAvatar(grp, dist, dt) {   // مشي: رجلين ودراعات بتتحرك مع المسافة
+function animAvatar(grp, dist, dt, pitch = 0) {   // مشي + تنفس + رمش + الراس بتبص مكان ما صاحبها باصص
   const U = grp.userData, sp = dist / Math.max(dt, 1e-3);
   U.amp += ((sp > 0.12 ? Math.min(1, sp / 1.1) : 0) - U.amp) * Math.min(1, dt * 8);
-  U.phase += dist * 4.4;
-  const s = Math.sin(U.phase), c = Math.cos(U.phase), a = U.amp;
+  U.phase += dist * 4.4; U.t += dt;
+  const s = Math.sin(U.phase), c = Math.cos(U.phase), a = U.amp, br = Math.sin(U.t * 1.6);
   U.hip[0].rotation.x = s * 0.55 * a; U.hip[1].rotation.x = -s * 0.55 * a;
   U.knee[0].rotation.x = -a * 0.7 * Math.max(0, c); U.knee[1].rotation.x = -a * 0.7 * Math.max(0, -c);
   U.sh[0].rotation.x = -s * 0.42 * a; U.sh[1].rotation.x = s * 0.42 * a;
-  U.el[0].rotation.x = U.el[1].rotation.x = 0.18 + 0.28 * a;
-  U.body.position.y = Math.abs(c) * 0.022 * a;
+  U.sh[0].position.y = U.sh[1].position.y = 1.39 + br * 0.004;
+  U.el[0].rotation.x = U.el[1].rotation.x = 0.2 + 0.28 * a;
+  U.body.position.y = Math.abs(c) * 0.022 * a; U.body.rotation.z = Math.sin(U.t * 0.7) * 0.008 * (1 - a);
+  U.hp += (Math.max(-0.6, Math.min(0.6, pitch * 0.6)) - U.hp) * Math.min(1, dt * 7); U.head.rotation.x = U.hp; U.head.rotation.y = Math.sin(U.t * 0.4) * 0.05 * (1 - a);
+  U.blink -= dt; const closed = U.blink < 0.12; if (U.blink < 0) U.blink = 2.2 + Math.random() * 3.5;
+  for (const l of U.lids) l.rotation.x = closed ? -1.25 : 0.15;
 }
 function peerSet(id, d) {
   let p = peers.get(id);
@@ -1038,7 +1093,7 @@ function peerSet(id, d) {
     p.grp = makeAvatar(p.name, p.g); p.grp.position.set(p.x, 0, p.z); scene.add(p.grp); peers.set(id, p); shDirty = 3;
     sys(p.name + (p.g === 'f' ? ' دخلت الشقة' : ' دخل الشقة')); refreshNet();
   }
-  p.tx = +d.x; p.tz = +d.z; p.tyaw = +d.y; p.last = performance.now();
+  p.tx = +d.x; p.tz = +d.z; p.tyaw = +d.y; p.tp = +d.p || 0; p.last = performance.now();
   return p;
 }
 function peerDrop(id) { const p = peers.get(id); if (!p) return; scene.remove(p.grp); peers.delete(id); shDirty = 3; sys(p.name + (p.g === 'f' ? ' خرجت' : ' خرج')); refreshNet(); }
@@ -1096,16 +1151,16 @@ function netTick(dt) {
     const k = Math.min(1, dt * 9), ox = p.x, oz = p.z; p.x += (p.tx - p.x) * k; p.z += (p.tz - p.z) * k;
     let dy = p.tyaw - p.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); p.yaw += dy * k;
     p.grp.position.set(p.x, 0, p.z); p.grp.rotation.y = p.yaw;
-    { const mv = Math.hypot(p.x - ox, p.z - oz); animAvatar(p.grp, mv, dt); if (mv > 0.0015) shDirty = 2; }
+    { const mv = Math.hypot(p.x - ox, p.z - oz); animAvatar(p.grp, mv, dt, p.tp || 0); if (mv > 0.0015) shDirty = 2; }
     if (p.bubble && (p.bt -= dt) <= 0) { p.grp.remove(p.bubble); p.bubble = null; }
   }
 }
 function netSend() {
   const now = performance.now();
   if (!online || !ME.name) return;
-  const pos = pl.x.toFixed(2) + ',' + pl.z.toFixed(2) + ',' + pl.yaw.toFixed(2), hb = now - lastHb > 1000;
+  const pos = pl.x.toFixed(2) + ',' + pl.z.toFixed(2) + ',' + pl.yaw.toFixed(2) + ',' + pl.pitch.toFixed(1), hb = now - lastHb > 1000;
   if ((pos !== lastPos && now - lastSend > 90) || hb) {
-    const o = { i: ME.id, n: ME.name, g: ME.g, x: +pl.x.toFixed(2), z: +pl.z.toFixed(2), y: +pl.yaw.toFixed(2) };
+    const o = { i: ME.id, n: ME.name, g: ME.g, x: +pl.x.toFixed(2), z: +pl.z.toFixed(2), y: +pl.yaw.toFixed(2), p: +pl.pitch.toFixed(1) };
     if (hb) { o.v = doorV; o.d = doorState(); lastHb = now; }
     pub('s', o); lastSend = now; lastPos = pos;
   }
@@ -1130,7 +1185,7 @@ chatIn.addEventListener('keyup', e => e.stopPropagation());
   const enter = () => {
     const v = nm.value.trim().slice(0, 20); if (!v) { nm.focus(); nm.style.borderColor = '#ff6b4a'; return; }
     ME.name = v; try { localStorage.setItem('apt_name', v); localStorage.setItem('apt_g', ME.g); } catch (e) {}
-    nm.blur(); begin(); if (!isTouch) lock(); netStart(); sys('أهلاً ' + v + ' — ' + (isTouch ? 'حرّك بالصباع الشمال وبص باليمين' : 'T للشات'));
+    nm.blur(); begin(); audioInit(); if (!isTouch) lock(); netStart(); sys('أهلاً ' + v + ' — ' + (isTouch ? 'حرّك بالصباع الشمال وبص باليمين' : 'T للشات'));
   };
   go.addEventListener('click', enter); nm.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') enter(); }); nm.addEventListener('keyup', e => e.stopPropagation());
 }
@@ -1242,16 +1297,19 @@ function penUI() {
   crossEl.style.margin = PEN.on ? (PEN.erase ? '-11px' : '-6px') : '';
   crossEl.style.border = PEN.on && PEN.erase ? '2px solid #fff' : '';
   canvas.style.cursor = PEN.on ? 'crosshair' : '';
+  document.getElementById('qP').classList.toggle('on', PEN.on && !PEN.erase); document.getElementById('qX').classList.toggle('on', PEN.on && PEN.erase);
 }
 function penToggle() { PEN.on = !PEN.on; if (!PEN.on) { PEN.drawing = false; penFlush(true); PEN.erase = false; } penUI(); }
 function penColor(c) { PEN.color = c; PEN.erase = false; penFlush(true); penUI(); }
 function penErase(v) { PEN.erase = v; penFlush(true); penUI(); }
-function strokesClearAll() { strokesClear(); pub('dc', { i: ME.id }); }
+function strokesClearAll() { if (!strokes.size) return; strokesClear(); pub('dc', { i: ME.id }); sys('اتمسحت كل الرسومات'); }
+function eraserKey() { if (!PEN.on) { penToggle(); penErase(true); } else penErase(!PEN.erase); }
 {
   PEN_COLORS.forEach((c, i) => { const b = document.createElement('button'); b.className = 'sw'; b.dataset.c = c; b.style.background = '#' + c.toString(16).padStart(6, '0'); b.style.color = (c === 0xffffff || c === 0xffcc00) ? '#222' : '#fff'; b.textContent = i + 1; b.onclick = () => penColor(c); penBar.appendChild(b); });
   const mk = (txt, fn, k) => { const b = document.createElement('button'); b.textContent = txt; if (k) b.dataset.k = k; b.onclick = fn; penBar.appendChild(b); };
   mk('ممحاة', () => penErase(!PEN.erase), 'er'); mk('مسح الكل', strokesClearAll); mk('✕', penToggle);
-  const bP = document.getElementById('bP'); if (bP) bP.addEventListener('click', penToggle);
+  document.getElementById('qP').onclick = penToggle; document.getElementById('qX').onclick = eraserKey; document.getElementById('qD').onclick = strokesClearAll;
+  document.getElementById('qS').onclick = e => { muted = !muted; e.currentTarget.firstChild.textContent = muted ? '🔇' : '🔊'; };
 }
 
 /* =====================================================================
