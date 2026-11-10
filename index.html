@@ -6,9 +6,10 @@
 <title>الشقة 3D</title>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#111;font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#fff}
-  #c{display:block;width:100vw;height:100vh}
+  #c{display:block;width:100vw;height:100vh;height:100dvh}
   #hud{position:fixed;top:12px;right:12px;background:rgba(18,18,18,.72);padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.7;min-width:210px;pointer-events:none}
   #hud b{font-size:17px;color:#ffd58a}
+  #hud .row{display:block}
   #hud .d{color:#9fe0ff;font-variant-numeric:tabular-nums}
   #help{position:fixed;bottom:12px;right:12px;background:rgba(18,18,18,.72);padding:8px 12px;border-radius:10px;font-size:12.5px;line-height:1.75;pointer-events:none}
   #help kbd{background:#333;border:1px solid #555;border-radius:4px;padding:0 5px;font-family:inherit;font-size:12px}
@@ -36,7 +37,16 @@
   #tbtn{position:fixed;right:14px;bottom:18px;display:none;flex-direction:column;gap:10px}
   #tbtn button{width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(20,20,20,.6);color:#fff;font-size:20px;font-weight:700}
   .touch #tbtn{display:flex} .touch #help{display:none} .touch #hint{bottom:30%}
-  @media (max-width:700px){ #map{width:150px;height:100px} #hud{font-size:12px;padding:7px 10px;min-width:0;line-height:1.55} #hud b{font-size:14px} #help{display:none} }
+  @media (max-width:700px){
+    #map{width:102px;height:68px;top:6px;left:6px;opacity:.85}
+    #hud{top:6px;right:6px;max-width:calc(100vw - 128px);font-size:11px;padding:4px 8px;min-width:0;line-height:1.4;background:rgba(18,18,18,.5);pointer-events:auto;border-radius:8px}
+    #hud b{font-size:12.5px;display:inline} #hud .row{display:inline;margin-inline-start:6px} #hud .lb{display:none}
+    #hud .row.x{display:none} #hud #net{display:block;margin:0;font-size:10.5px}
+    #hud.open .row{display:block;margin:0} #hud.open .lb{display:inline}
+    #help{display:none}
+    #chatlog{left:6px;bottom:8px;max-width:58vw;font-size:11.5px;line-height:1.45} #chatlog div{padding:1px 7px;margin-top:2px}
+    #penbar{top:auto;bottom:150px;padding:6px 8px;gap:5px;max-width:96vw;flex-wrap:wrap;justify-content:center} #penbar .sw{width:28px;height:28px}
+  }
   canvas#c{touch-action:none}
   #penbar{position:fixed;left:50%;top:12px;transform:translateX(-50%);display:none;gap:8px;align-items:center;background:rgba(18,18,18,.85);padding:8px 12px;border-radius:14px;z-index:5}
   #penbar button{font:inherit;font-size:13px;border:2px solid #555;background:#222;color:#fff;border-radius:10px;padding:6px 10px;cursor:pointer}
@@ -47,13 +57,13 @@
   #qbar button{font:inherit;font-size:18px;line-height:1.1;width:62px;padding:6px 2px;border-radius:10px;border:2px solid #555;background:rgba(18,18,18,.8);color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
   #qbar small{font-size:9.5px;color:#ccc;white-space:nowrap}
   #qbar .on{border-color:#ffd58a;background:#3a2f18}
-  @media (max-width:700px){ #qbar{top:122px} #qbar button{width:50px;font-size:16px} #qbar small{display:none} }
+  @media (max-width:700px){ #qbar{top:82px;left:6px;gap:4px} #qbar button{width:38px;font-size:15px;padding:4px 0;border-width:1px;background:rgba(18,18,18,.55)} #qbar small{display:none} }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <canvas id="map" width="270" height="180"></canvas>
-<div id="hud"><b id="room">—</b><br>المقاس: <span class="d" id="dims">—</span> م<br>المسافة قدامك: <span class="d" id="dist">—</span> م<br>ارتفاع السقف: <span class="d" id="ceil">—</span> م<br>زاوية الرؤية: <span class="d" id="fov">—</span>°<br><span id="net">—</span></div>
+<div id="hud"><b id="room">—</b><span class="row r1"><span class="lb">المقاس: </span><span class="d" id="dims">—</span> م</span><span class="row x">المسافة قدامك: <span class="d" id="dist">—</span> م</span><span class="row x">ارتفاع السقف: <span class="d" id="ceil">—</span> م</span><span class="row x">زاوية الرؤية: <span class="d" id="fov">—</span>°</span><span class="row" id="net">—</span></div>
 <div id="help">
   <kbd>W</kbd><kbd>S</kbd> / <kbd>↑</kbd><kbd>↓</kbd> مشي &nbsp; <kbd>A</kbd><kbd>D</kbd> جنب &nbsp; <kbd>←</kbd><kbd>→</kbd> لف<br>
   الماوس: بص حواليك (كليك أو اسحب) &nbsp; <kbd>Shift</kbd> جري<br>
@@ -1066,6 +1076,7 @@ const ROOM = (qs.get('room') || 'home-k7q2x9').replace(/[^\w-]/g, '').slice(0, 4
 const BASE = 'apt3d/' + ROOM;
 const ME = { id: Math.random().toString(36).slice(2, 10), name: '', g: 'm' };
 const peers = new Map();
+const hudEl = document.getElementById('hud'); hudEl.addEventListener('click', () => { hudEl.classList.toggle('open'); refreshNet(); });
 const netEl = document.getElementById('net'), chatLog = document.getElementById('chatlog'), chatIn = document.getElementById('chatin');
 const typing = () => document.activeElement === chatIn || document.activeElement === document.getElementById('nm');
 
@@ -1186,15 +1197,18 @@ function peerSet(id, d) {
 function peerDrop(id) { const p = peers.get(id); if (!p) return; scene.remove(p.grp); peers.delete(id); shDirty = 3; sys(p.name + (p.g === 'f' ? ' خرجت' : ' خرج')); refreshNet(); }
 function refreshNet() {
   const names = [...peers.values()].map(p => p.name);
-  netEl.textContent = (ME.name ? 'أنت: ' + ME.name + ' — ' : '') + (online ? 'أونلاين' : 'أوفلاين') + ' — ' + (names.length ? 'معاك: ' + names.join('، ') : 'لوحدك دلوقتي');
+  const small = innerWidth < 700 && !hudEl.classList.contains('open');
+  netEl.textContent = small ? (online ? '● ' : '○ ') + (names.length ? names.length + ' معاك' : 'لوحدك')
+    : (ME.name ? 'أنت: ' + ME.name + ' — ' : '') + (online ? 'أونلاين' : 'أوفلاين') + ' — ' + (names.length ? 'معاك: ' + names.join('، ') : 'لوحدك دلوقتي');
   netEl.style.color = online ? '#9ff0b0' : '#ffb0a0';
 }
 function addLine(who, msg, cls) {
   const d = document.createElement('div'); if (cls) d.className = cls;
   if (who) { const b = document.createElement('b'); b.textContent = who + ': '; d.appendChild(b); }
   d.appendChild(document.createTextNode(msg)); chatLog.appendChild(d);
-  while (chatLog.children.length > 8) chatLog.removeChild(chatLog.firstChild);
-  clearTimeout(addLine.t); chatLog.style.opacity = 1; addLine.t = setTimeout(() => { chatLog.style.opacity = 0.45; }, 9000);
+  const sm = innerWidth < 700;
+  while (chatLog.children.length > (sm ? 3 : 8)) chatLog.removeChild(chatLog.firstChild);
+  clearTimeout(addLine.t); chatLog.style.opacity = 1; addLine.t = setTimeout(() => { chatLog.style.opacity = sm ? 0 : 0.45; }, sm ? 5000 : 9000);
 }
 const sys = m => addLine('', m, 'sys');
 
@@ -1441,7 +1455,8 @@ let curRoom = null, hudT = 0;
 function hud(dt) {
   hudT += dt; if (hudT < 0.12) return; hudT = 0;
   curRoom = null; for (const k in R) { const r = R[k]; if (pl.x >= r.x0 && pl.x <= r.x1 && pl.z >= r.z0 && pl.z <= r.z1) { curRoom = k; break; } }
-  roomEl.textContent = curRoom ? R[curRoom].name : '—'; dimsEl.textContent = curRoom ? R[curRoom].dims : '—';
+  roomEl.textContent = curRoom ? R[curRoom].name : '—';
+  { const dm = curRoom ? R[curRoom].dims : '—'; dimsEl.textContent = (innerWidth < 700 && !hudEl.classList.contains('open')) ? dm.split(' (')[0].replace('≈ ', '') : dm; }
   ray.setFromCamera(new THREE.Vector2(0, 0), camera);
   const hit = ray.intersectObjects(scene.children, true).find(h => h.object.material !== M.glass && h.object.material !== M_ao && !h.object.userData.nh && h.object.isMesh && h.distance > 0.05);
   distEl.textContent = hit ? hit.distance.toFixed(2) : '—';
