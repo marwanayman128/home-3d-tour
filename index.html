@@ -163,7 +163,7 @@ const T_porc = tex(512, 512, (g, w, h) => {
 // أرضية الأوض: بلاطات شكل خشب 20×120 (التكستشر = 1.2م)، u = طول اللوح
 const woodOffs = [];
 const T_wood = tex(2048, 512, (g, w, h) => {   // 2.4م × 1.2م : 6 صفوف × لوحين 120سم
-  const rows = 6, rh = h / rows, base = [[160, 126, 88], [154, 120, 83], [166, 132, 94], [150, 117, 80], [158, 124, 87], [163, 129, 91]];
+  const rows = 6, rh = h / rows, base = [[150, 126, 100], [143, 120, 95], [157, 133, 107], [138, 116, 92], [147, 124, 99], [153, 130, 104]];   // بني مايل للرمادي زي صور الماستر
   for (let r = 0; r < rows; r++) {
     const off = Math.floor(rnd() * w); woodOffs.push(off);
     for (let k = 0; k < 2; k++) {
@@ -171,7 +171,7 @@ const T_wood = tex(2048, 512, (g, w, h) => {   // 2.4م × 1.2م : 6 صفوف ×
       for (const sh of [0, -w]) { g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(x0 + sh, r * rh, w / 2, rh); }
       for (let i = 0; i < 70; i++) {
         const y = r * rh + 2 + rnd() * (rh - 4), x = x0 + rnd() * w / 2, len = 80 + rnd() * 500;
-        g.strokeStyle = rnd() > 0.45 ? 'rgb(96,68,40)' : 'rgb(205,178,138)'; g.globalAlpha = 0.06 + rnd() * 0.16; g.lineWidth = 0.6 + rnd() * 2.4;
+        g.strokeStyle = rnd() > 0.45 ? 'rgb(92,72,54)' : 'rgb(198,178,152)'; g.globalAlpha = 0.06 + rnd() * 0.16; g.lineWidth = 0.6 + rnd() * 2.4;
         for (const sh of [0, -w]) { g.beginPath(); g.moveTo(x + sh, y); g.bezierCurveTo(x + sh + len * .3, y + (rnd() - .5) * 5, x + sh + len * .7, y + (rnd() - .5) * 5, x + sh + len, y + (rnd() - .5) * 3); g.stroke(); }
       }
       g.globalAlpha = 1;
@@ -330,7 +330,7 @@ const M = {
   bwall:   S({ map: T_bwall, roughness: 0.28, bumpMap: T_bwallB, bumpScale: 1.3 }),
   mandala: S({ map: T_mandala, roughness: 0.3, bumpMap: T_mandalaB, bumpScale: 1.2 }),
   pebble:  S({ map: T_pebble, roughness: 0.8 }),
-  skWood:  S({ color: 0xa57f54, roughness: 0.6 }),
+  skWood:  S({ color: 0x9a7e60, roughness: 0.6 }),
   skTile:  S({ color: 0xb9ab95, roughness: 0.5 }),
   dFrame:  S({ color: 0x15100d, roughness: 0.3, metalness: 0.1 }),
   dPanel:  S({ color: 0x9a5326, roughness: 0.5 }),
@@ -668,7 +668,7 @@ column(10.01, 10.16, 4.35, 5.35, M.skWood);                          // الأو
 column(7.13, 7.33, 7.52, 7.77, M.skWood); column(10.00, 10.16, 7.57, 7.77, M.skWood);
 column(3.95, 4.25, 4.35, 4.47, M.skWood);                           // أوضة النوم — شمال غرب
 column(3.95, 4.15, 7.57, 7.77, M.skWood); column(6.83, 6.98, 7.45, 7.77, M.skWood);
-column(-0.10, 0.02, 3.20, 3.56, M.skWood);
+column(-0.10, 0.05, 3.20, 3.62, M.skWood);                 // الماستر — شمال غرب: بروز على الحيطة الغربية (15سم × 42سم) من صور الحيطان
 column(-0.10, 0.24, 7.19, 7.30, M.skWood);                // الماستر — جنوب غرب: بروز جنب الشباك (34سم عرض × 11سم) من صورة الأوضة                           // الماستر — شمال غرب
 
 /* =====================================================================
@@ -772,9 +772,11 @@ plate('N', 6.43, 12.5, LOW); plate('N', 6.43, 14.6, LOW);
 plate('E', 10.31, 5.45, SWH, 'sw', 1); plate('E', 10.31, 5.60, SWH, 'sw', 2); plate('E', 10.31, 5.75, SWH, 'sw', 1);
 plate('E', 10.31, 2.55, LOW); plate('E', 10.31, 1.0, LOW);
 // الماستر
-plate('W', 3.80, 4.53, 1.20, 'sw', 3); plate('W', 3.80, 4.62, 0.32); plate('W', 3.80, 4.97, 0.30);   // مفتاح 3 زراير + فيشتين تحت
-plate('E', -0.10, 5.75, 1.10); plate('E', -0.10, 5.90, 1.10, 'sw', 1); plate('E', -0.10, 6.05, 1.10, 'sw', 1);
-plate('N', 7.30, 1.75, 1.0, 'sw', 1);
+// الحيطة الشرقية (من صورة الحيطة): مفتاح 3 زراير جنب الباب، تحته فيشتين جنب بعض، فيشة لوحدها ناحية الركن، وغطا التكييف فوق
+plate('W', 3.80, 4.56, 1.11, 'sw', 3); plate('W', 3.80, 4.56, 0.55); plate('W', 3.80, 4.70, 0.55); plate('W', 3.80, 6.60, 0.59); plate('W', 3.80, 4.92, 2.08, 'blank');
+// الحيطة الغربية: 3 لوحات جنب بعض (فيشة — مفتاح 3 — فيشة) على ارتفاع 109سم
+plate('E', -0.10, 5.415, 1.09); plate('E', -0.10, 5.56, 1.09, 'sw', 3); plate('E', -0.10, 5.705, 1.09);
+plate('N', 7.30, 1.77, 1.15, 'sw', 1);
 // أوضة النوم
 plate('S', 4.35, 5.72, SWH, 'sw', 2); plate('S', 4.35, 5.74, 0.32); plate('S', 4.35, 5.05, 2.30, 'blank');
 plate('N', 7.77, 5.95, 1.08, 'sw', 1);
