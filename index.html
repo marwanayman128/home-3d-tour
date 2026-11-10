@@ -804,7 +804,7 @@ plate('S', 0.03 + EPS, 7.25, 1.95);
 plate('S', 1.22 + EPS, 4.57, 1.28); plate('S', 1.22 + EPS, 5.24, 1.22, 'sw', 3); plate('S', 1.22 + EPS, 6.20, 1.90);
 plate('E', 3.81 + EPS, 2.62, 1.55, 'sw', 2); plate('E', 3.81 + EPS, 2.64, 0.72); plate('W', 6.66 - EPS, 1.50, 1.60, 'sw', 1);
 // الطرقة
-plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
+plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 5.78, SWH, 'sw', 1);
 
 /* =====================================================================
    المطبخ — الحوض
@@ -869,7 +869,10 @@ plate('N', 4.20, 9.2, SWH, 'sw', 2); plate('S', 3.20, 4.9, SWH, 'sw', 1);
   const loop = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.006, 8, 20, Math.PI), M.chrome); loop.position.set(5.51, 1.33, zN + 0.045); scene.add(loop);
   cyl(0.011, 0.36, M.white, 5.55, 1.12, zN + 0.06, 'x');
   for (const ex of [5.37, 5.73]) B(ex - 0.02, ex + 0.02, 1.10, 1.14, zN, zN + 0.075, M.white);
-  cyl(0.06, 0.006, M.steel, 4.57, 0.003, 2.15); cyl(0.045, 0.008, M.dark, 4.57, 0.003, 2.15);   // بلاعة الأرضية
+  { const dx = 4.60, dz = R.bath.z0 + 0.55;   // بلاعة الأرضية: غطا استانلس مدوّر بفتحات (قدام الفراغ بين القاعدة والحوض)
+    cyl(0.058, 0.004, M.steel, dx, 0.002, dz); cyl(0.05, 0.005, M.chrome, dx, 0.003, dz);
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; cyl(0.006, 0.006, M.dark, dx + Math.cos(a) * 0.03, 0.0035, dz + Math.sin(a) * 0.03); }
+    cyl(0.007, 0.007, M.steel, dx, 0.004, dz); }
   for (const zz of [2.55, 2.68]) cyl(0.02, 0.03, M.dark, R.bath.x0 + 0.015, 0.36, zz, 'x');     // مخارج الغسالة
   cyl(0.028, 0.03, M.dark, R.bath.x0 + 0.015, 0.30, 2.615, 'x');
 
