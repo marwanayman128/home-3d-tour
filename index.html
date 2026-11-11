@@ -1258,23 +1258,52 @@ const decor = new THREE.Group(); scene.add(decor);
       bx(xe - 0.3, xe - 0.08, 0.52, 0.58, tc - 0.55, tc - 0.25, mWht); hit(xe - 0.36, xe, tc - 0.66, tc + 0.66);
     }
     // ---- أنتريه كورنر في الركن الجنوبي الغربي: الضلع الطويل (2.05م) على الحيطة الغربية قصاد التلفزيون + ضلع تحت الشباك (1.95م) + باف
-    const zS = r.z1, s0 = zS - 2.05, s1 = zS - 0.85, xS = xw + 1.95;
-    bx(xw, xw + 0.85, 0.10, 0.40, s0, zS, mSofa2); bx(xw + 0.85, xS, 0.10, 0.40, s1, zS, mSofa2);
-    bx(xw, xw + 0.22, 0.40, 0.82, s0, zS, mSofa2); bx(xw + 0.22, xS, 0.40, 0.82, zS - 0.22, zS, mSofa2);
-    bx(xw + 0.22, xw + 0.85, 0.40, 0.60, s0, s0 + 0.16, mSofa2); bx(xS - 0.16, xS, 0.40, 0.60, s1, zS - 0.22, mSofa2);
-    bx(xw + 0.23, xw + 0.83, 0.40, 0.50, s0 + 0.17, s0 + 0.675, mSofa); bx(xw + 0.23, xw + 0.83, 0.40, 0.50, s0 + 0.695, s1 - 0.01, mSofa); bx(xw + 0.23, xw + 0.84, 0.40, 0.50, s1 + 0.01, zS - 0.23, mSofa);
-    bx(xw + 0.86, xw + 1.31, 0.40, 0.50, s1 + 0.02, zS - 0.23, mSofa); bx(xw + 1.33, xS - 0.17, 0.40, 0.50, s1 + 0.02, zS - 0.23, mSofa);
-    cushion(xw + 0.3, 0.64, s0 + 0.4, 0.07, 0.16, 0.19, mRed); cushion(xw + 0.34, 0.64, zS - 0.34, 0.13, 0.16, 0.13, mBlk); cushion(xS - 0.5, 0.64, zS - 0.3, 0.19, 0.16, 0.07, mRed);
+    const zS = r.z1, s0 = zS - 2.05, s1 = zS - 0.85, xS = xw + 1.95, mSg = S({ color: 0x8f9b7d, roughness: 1 }), mSg2 = S({ color: 0x7c8869, roughness: 1 }), mCu = S({ color: 0x5c3b2e, roughness: 1 }), mCu2 = S({ color: 0x7a4f3a, roughness: 1 });
+    bx(xw, xw + 0.85, 0.10, 0.40, s0, zS, mSg2); bx(xw + 0.85, xS, 0.10, 0.40, s1, zS, mSg2);
+    bx(xw, xw + 0.22, 0.40, 0.82, s0, zS, mSg2); bx(xw + 0.22, xS, 0.40, 0.82, zS - 0.22, zS, mSg2);
+    bx(xw + 0.22, xw + 0.85, 0.40, 0.60, s0, s0 + 0.16, mSg2); bx(xS - 0.16, xS, 0.40, 0.60, s1, zS - 0.22, mSg2);
+    bx(xw + 0.23, xw + 0.83, 0.40, 0.50, s0 + 0.17, s0 + 0.675, mSg); bx(xw + 0.23, xw + 0.83, 0.40, 0.50, s0 + 0.695, s1 - 0.01, mSg); bx(xw + 0.23, xw + 0.84, 0.40, 0.50, s1 + 0.01, zS - 0.23, mSg);
+    bx(xw + 0.86, xw + 1.31, 0.40, 0.50, s1 + 0.02, zS - 0.23, mSg); bx(xw + 1.33, xS - 0.17, 0.40, 0.50, s1 + 0.02, zS - 0.23, mSg);
+    cushion(xw + 0.3, 0.64, s0 + 0.4, 0.07, 0.16, 0.19, mCu); cushion(xw + 0.34, 0.64, zS - 0.34, 0.13, 0.16, 0.13, mCu2); cushion(xS - 0.5, 0.64, zS - 0.3, 0.19, 0.16, 0.07, mCu);
     hit(xw, xw + 0.85, s0, zS); hit(xw + 0.85, xS, s1, zS);
     cy(xw + 1.35, 0.19, zS - 1.35, 0.22, 0.38, mTerra); hit(xw + 1.13, xw + 1.57, zS - 1.57, zS - 1.13);
-    // ---- هيكساجون LED فوق الكنبة + بلاك أوت للشباك + بوسترين + عمود نور RGB
-    { const u = 0.15, zc = (s0 + s1) / 2, hx = [[0, 0, mCyan], [1.5, 0.866, mPurp], [3, 0, mPink], [4.5, 0.866, mCyan], [3, 1.732, mPurp], [-1.5, -0.866, mPink], [6, 0, mPurp], [0, 1.732, mCyan]];
-      for (const [dz, dy, m] of hx) { const h = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.02, 6), m); h.rotation.z = Math.PI / 2; h.position.set(xw + 0.012, 1.55 + dy * u, zc + (dz - 2.25) * u); W.add(h); }
-      const L = new THREE.PointLight(0xffd9a0, 1.3, 5, 1.8); L.position.set(xw + 0.55, 1.6, zc); W.add(L); }
+    // ---- روح الـ reference: حيطة الكنبة كلها شرايح جوز + شريط نجيلة (moss) في الركن + بوستر كبير + أباجورة قوس برتقاني — وعلى حيطة التلفزيون: شرايح يمين وشمال + مربع نجيلة فوق الشاشة + 3 بوسترات باوهاوس + عمود نور دافي
+    { const tc = zN + 2.10, mOrL = new THREE.MeshBasicMaterial({ color: 0xff9a4a }), mMossB = S({ color: 0x2c4a22, roughness: 1 }), mMossT = S({ color: 0xffffff, roughness: 1, flatShading: true }), GRN = [0x3f6b2a, 0x55852f, 0x6f9a3a, 0x2f5524, 0x86a84a];
+      const slatsX = (xf, nx, z0, n, y0, y1) => { const im = new THREE.InstancedMesh(new THREE.BoxGeometry(0.022, y1 - y0, 0.03), mWal, n), o = new THREE.Object3D(); for (let i = 0; i < n; i++) { o.position.set(xf + nx * 0.011, (y0 + y1) / 2, z0 + 0.015 + i * 0.05); o.updateMatrix(); im.setMatrixAt(i, o.matrix); } W.add(im); };
+      const moss = (xf, nx, y0, y1, z0, z1) => { bx(Math.min(xf, xf + nx * 0.03), Math.max(xf, xf + nx * 0.03), y0, y1, z0, z1, mMossB);
+        const n = Math.round((y1 - y0) * (z1 - z0) * 620), im = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), mMossT, n), o = new THREE.Object3D(), c = new THREE.Color();
+        for (let i = 0; i < n; i++) { const q = 0.028 + rnd() * 0.034; o.position.set(xf + nx * (0.03 + rnd() * 0.014), y0 + 0.025 + rnd() * (y1 - y0 - 0.05), z0 + 0.025 + rnd() * (z1 - z0 - 0.05)); o.scale.set(q * 0.6, q, q); o.rotation.x = rnd() * 6; o.updateMatrix(); im.setMatrixAt(i, o.matrix); im.setColorAt(i, c.setHex(GRN[(rnd() * 5) | 0]).multiplyScalar(0.8 + rnd() * 0.4)); }
+        im.instanceColor.needsUpdate = true; W.add(im); };
+      const art = k => S({ roughness: 0.9, map: tex(128, 176, (g, w, h) => { const O = '#e2622a', Rd = '#c8322b', Bk = '#1c1c1e', Yl = '#e9a23b', disc = (x, y, r, col, a0 = 0, a1 = 6.2832) => { g.fillStyle = col; g.beginPath(); g.moveTo(x, y); g.arc(x, y, r, a0, a1); g.fill(); };
+        g.fillStyle = k === 3 ? '#1f6f6b' : '#efe6d2'; g.fillRect(0, 0, w, h);
+        if (k === 0) { disc(64, 70, 40, O); disc(64, 70, 40, Bk, -1.57, 1.57); disc(92, 118, 12, Rd); g.fillStyle = Bk; g.fillRect(16, 146, 96, 6); }
+        if (k === 1) { disc(64, 62, 38, Rd); disc(64, 62, 24, O); g.fillStyle = Bk; g.fillRect(14, 116, 100, 4); for (let i = 0; i < 4; i++) disc(26 + i * 25, 140, 8, [Rd, O, Yl, Bk][i]); }
+        if (k === 2) { g.fillStyle = O; g.fillRect(0, 0, 64, 88); g.fillStyle = Bk; g.fillRect(64, 88, 64, 88); disc(64, 88, 34, Yl, 3.1416, 4.7124); disc(64, 88, 34, Rd, 0, 1.5708); g.fillStyle = Rd; g.fillRect(14, 150, 40, 8); }
+        if (k === 3) { disc(64, 60, 44, Yl); disc(64, 60, 30, O); g.fillStyle = Bk; for (let i = 0; i < 6; i++) g.fillRect(0, 112 + i * 11, w, 5); g.fillStyle = O; g.fillRect(40, 96, 48, 70); g.fillStyle = '#efe6d2'; g.fillRect(50, 108, 10, 10); g.fillRect(68, 108, 10, 10); g.fillRect(50, 136, 28, 6); } }) });
+      const snake = (x, y, z, h, q = 1) => { cy(x, y + 0.07 * q, z, 0.075 * q, 0.14 * q, mPot, W, 'y', 0.06 * q); for (let i = 0; i < 8; i++) { const an = i * 0.85, hh = h * (0.6 + rnd() * 0.4), m = new THREE.Mesh(new THREE.ConeGeometry(0.026 * q, hh, 4), i % 2 ? mLeaf : mLeaf2); m.scale.z = 0.35; m.position.set(x + Math.cos(an) * 0.035 * q, y + 0.14 * q + hh / 2, z + Math.sin(an) * 0.035 * q); m.rotation.set(Math.sin(an) * 0.13, an, Math.cos(an) * 0.13); W.add(m); } };
+      // حيطة الكنبة (الغربية): خلفية غامقة + شرايح جوز من الأرض للسقف — وآخر 66سم في الركن نجيلة وبينهم خط ليد دافي
+      bx(xw, xw + 0.003, 0, H, zN, zS - 0.66, mBlk); slatsX(xw + 0.003, 1, zN + 0.01, 54, 0, H);
+      moss(xw, 1, 0.82, H, zS - 0.66, zS); bx(xw + 0.003, xw + 0.02, 0.82, H, zS - 0.685, zS - 0.667, mCyan);
+      { const zc = (s0 + s1) / 2; bx(xw + 0.025, xw + 0.05, 1.15, 2.10, zc - 0.33, zc + 0.33, mBlk); bx(xw + 0.05, xw + 0.054, 1.17, 2.08, zc - 0.31, zc + 0.31, art(3)); }
+      // أباجورة قوس بقبة برتقاني فوق أول الكنبة
+      { const lx = xw + 0.30, lz = s0 - 0.22, Rr = 0.45, g = new THREE.Group(); g.position.set(lx, 1.55, lz); g.rotation.y = -1.17; W.add(g);
+        cy(lx, 0.02, lz, 0.16, 0.04, mBlk); cy(lx, 0.79, lz, 0.012, 1.52, mSteel2); hit(lx - 0.16, lx + 0.16, lz - 0.16, lz + 0.16);
+        const t = new THREE.Mesh(new THREE.TorusGeometry(Rr, 0.012, 8, 28, Math.PI), mSteel2); t.position.x = Rr; g.add(t);
+        const dm = new THREE.Mesh(new THREE.SphereGeometry(0.17, 22, 10, 0, 6.2832, 0, 1.5708), S({ color: 0xf07a2a, emissive: 0xd9571a, emissiveIntensity: 0.7, roughness: 0.4, side: THREE.DoubleSide })); dm.position.set(2 * Rr, -0.17, 0); g.add(dm);
+        const bl = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffe0b0 })); bl.position.set(2 * Rr, -0.13, 0); g.add(bl);
+        const L = new THREE.PointLight(0xffb066, 1.5, 5, 1.8); L.position.set(lx + 0.35, 1.32, lz + 0.83); W.add(L); }
+      // حيطة التلفزيون (الشرقية): شرايح جنوب الشاشة فوق الميني بار وعليها 3 بوسترات — ومربع نجيلة فوق الشاشة على الأسود
+      slatsX(xe - 0.003, -1, 7.12 * K, 7, 0.85, H);
+      [[1.00, 0], [1.46, 1], [1.92, 2]].forEach(([y, k]) => { bx(xe - 0.045, xe - 0.025, y, y + 0.40, 7.145 * K, 7.445 * K, mBlk); bx(xe - 0.049, xe - 0.045, y + 0.018, y + 0.382, 7.163 * K, 7.427 * K, art(k)); });
+      moss(xe, -1, 1.66, 2.26, tc + 0.13 - 0.42, tc + 0.13 + 0.42);
+      // عمود نور دافي واقف قدام الشرايح شمال الوحدة
+      { const px = xe - 0.15, pz = 5.27 * K + 0.25; cy(px, 0.05, pz, 0.075, 0.1, mBlk); bx(px - 0.012, px + 0.012, 0.1, 1.62, pz - 0.012, pz + 0.012, mBlk); bx(px + 0.012, px + 0.016, 0.14, 1.60, pz - 0.009, pz + 0.009, mOrL);
+        const L = new THREE.PointLight(0xff9450, 0.9, 3.2, 1.8); L.position.set(px - 0.08, 1.0, pz); W.add(L); }
+      // زرع جلد النمر: على الوحدة + على الأرض جنب الشباك
+      snake(xe - 0.2, 0.52, tc + 0.5, 0.3); snake(xS + 0.32, 0, zS - 0.28, 0.6, 1.5); }
     { const L2 = new THREE.PointLight(0xffd9a0, 0.9, 3.5, 1.8); L2.position.set(mx, 1.45, zN + 0.4); W.add(L2); }   // نور ليد الرف على سطح المكتب
     { const a = WIN.office.a * K, b = WIN.office.b * K; bx(a - 0.06, b + 0.06, 2.07, 2.15, r.z1 - 0.07, r.z1, mBlk); bx(a - 0.04, b + 0.04, 1.72, 2.08, r.z1 - 0.035, r.z1 - 0.03, S({ color: 0x3a3d42, roughness: 1 })); bx(a - 0.04, b + 0.04, 1.70, 1.72, r.z1 - 0.04, r.z1 - 0.025, mBlk); }
-    for (const [a, col, c2] of [[xw + 0.25, mNavy, mYel], [xw + 0.75, mTerra, mCream]]) { bx(a, a + 0.42, 1.22, 1.80, r.z1 - 0.02, r.z1, mBlk); bx(a + 0.025, a + 0.395, 1.245, 1.775, r.z1 - 0.024, r.z1 - 0.02, col); cy(a + 0.21, 1.56, r.z1 - 0.026, 0.09, 0.004, c2, W, 'z'); bx(a + 0.09, a + 0.33, 1.30, 1.34, r.z1 - 0.027, r.z1 - 0.024, c2); }
-    cy(xw + 0.12, 0.015, s0 - 0.18, 0.09, 0.03, mBlk); cy(xw + 0.12, 0.8, s0 - 0.18, 0.018, 1.55, mPurp);
+    for (const [a, col, c2] of [[xw + 0.25, mCream, mTerra], [xw + 0.75, S({ color: 0xe2702a, roughness: 0.9 }), mCream]]) { bx(a, a + 0.42, 1.22, 1.80, r.z1 - 0.02, r.z1, mBlk); bx(a + 0.025, a + 0.395, 1.245, 1.775, r.z1 - 0.024, r.z1 - 0.02, col); cy(a + 0.21, 1.56, r.z1 - 0.026, 0.09, 0.004, c2, W, 'z'); bx(a + 0.09, a + 0.33, 1.30, 1.34, r.z1 - 0.027, r.z1 - 0.024, c2); }
     bx(xw + 0.92, xe - 0.5, 0.002, 0.013, zN + 1.5, zS - 0.9, S({ color: 0x4a4a4c, roughness: 1 }));
   }
   // =================== أوضة الأطفال ===================
