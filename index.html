@@ -1429,7 +1429,7 @@ const decor = new THREE.Group(); scene.add(decor);
         bx(xc - 0.4, xc + 0.4, y, y + 0.28, z - 0.2, z, mWht); bx(xc - 0.37, xc + 0.37, y + 0.012, y + 0.04, z - 0.203, z - 0.2, mSl); bx(xc - 0.36, xc - 0.28, y + 0.2, y + 0.23, z - 0.202, z - 0.2, mSl); } }
     // ---------- أباجورات سقف حوالين اللمبات ----------
     { const shade = (x, z, rad, col, op) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad * 1.12, 0.2, 24, 1, true), S({ color: col, roughness: 1, transparent: op < 1, opacity: op, side: THREE.DoubleSide })); m.position.set(x * K, H - 0.13, z * K); W.add(m); cy(x * K, H - 0.015, z * K, rad * 0.5, 0.03, mWht); };
-      shade(12.94, 1.90, 0.24, 0xefe6d2, 0.85); shade(12.94, 4.40, 0.24, 0xefe6d2, 0.85); shade(8.19, 1.49, 0.2, 0xffffff, 0.85);
+      shade(12.94, 1.90, 0.24, 0xefe6d2, 0.85); shade(12.94, 4.40, 0.24, 0xefe6d2, 0.85); 
       shade(5.44, 5.3, 0.2, 0xf0c95a, 0.9); shade(5.44, 6.7, 0.2, 0x6fa0d8, 0.9); shade(8.57, 5.3, 0.2, 0x1c1c1e, 1); shade(8.57, 6.7, 0.2, 0x1c1c1e, 1); }
     // ---------- الماستر: كتاب وكوباية وموبايل على الكوميدينو + شبشب ----------
     { const r = E('master'), xe = r.x1, bc = (4.72 * K + 6.99 * K) / 2, b0 = bc - 0.90, b1 = bc + 0.90, nS = b1 + 0.06, nN = b0 - 0.56;
@@ -1485,6 +1485,39 @@ const decor = new THREE.Group(); scene.add(decor);
     { const r = E('terr'), n = 12; cy((r.x0 + r.x1) / 2, 2.5, r.z1 - 0.1, 0.004, r.x1 - r.x0 - 0.2, mBlk, W, 'x');
       for (let i = 0; i < n; i++) { const x = r.x0 + 0.25 + i * (r.x1 - r.x0 - 0.5) / (n - 1); cy(x, 2.46, r.z1 - 0.1, 0.003, 0.08, mBlk); ball(x, 2.40, r.z1 - 0.1, 0.03, mWarm); }
       bx(r.x1 - 1.75, r.x1 - 0.05, 0.002, 0.012, r.z0 + 0.12, r.z0 + 1.08, mJute); }
+    // ---------- إضافات بعد المقاسات الحقيقية ----------
+    { // الريسبشن: كونسول رفيع ورا ضهر الركنة (ناحية السفرة) + أباجورة وكتب وزرعة وسلتين
+      const r = E('rec'), sx0 = r.x0 + 1.72, sz0 = r.z1 - 2.85, a = sz0 + 0.35, b = sz0 + 1.95, cx = sx0 - 0.16;
+      bx(sx0 - 0.30, sx0 - 0.02, 0.72, 0.76, a, b, mWal); for (const z of [a + 0.03, b - 0.07]) for (const x of [sx0 - 0.29, sx0 - 0.06]) bx(x, x + 0.03, 0, 0.72, z, z + 0.04, mBlk); bx(sx0 - 0.28, sx0 - 0.04, 0.2, 0.22, a + 0.05, b - 0.05, mWal);
+      cy(cx, 0.80, a + 0.25, 0.07, 0.08, mBlk); cy(cx, 0.93, a + 0.25, 0.012, 0.2, mBlk); cy(cx, 1.1, a + 0.25, 0.11, 0.2, mCream, W, 'y', 0.15); cy(cx, 1.0, a + 0.25, 0.09, 0.01, mWarm);
+      [mOlive, mTerra, mCream].forEach((m, i) => bx(sx0 - 0.26, sx0 - 0.07, 0.76 + i * 0.03, 0.79 + i * 0.03, b - 0.55 + i * 0.01, b - 0.3 - i * 0.01, m));
+      cy(cx, 0.81, (a + b) / 2, 0.09, 0.1, mPot, W, 'y', 0.06); for (let i = 0; i < 6; i++) cushion(cx + Math.cos(i * 1.1) * 0.06, 0.9 + i * 0.02, (a + b) / 2 + Math.sin(i * 1.1) * 0.06, 0.06, 0.016, 0.03, i % 2 ? mLeaf : mLeaf2);
+      cy(cx, 0.30, a + 0.4, 0.11, 0.16, mJute); cy(cx, 0.30, b - 0.4, 0.11, 0.16, mJute); hit(sx0 - 0.30, sx0, a, b); }
+    { // المطبخ: بار فطار على الحيطة الجنوبية + كرسيين + رف مجات + سقف جبس بسبوتات
+      const r = E('kit'), a = r.x0 + 0.75, b = a + 1.2, z = r.z1;
+      bx(a, b, 0.90, 0.94, z - 0.38, z, mWal); for (const x of [a + 0.08, b - 0.11]) bx(x, x + 0.03, 0.58, 0.90, z - 0.32, z - 0.01, mBlk);
+      for (const x of [a + 0.3, b - 0.3]) { cy(x, 0.66, z - 0.62, 0.16, 0.04, mWal); cy(x, 0.33, z - 0.62, 0.015, 0.64, mBlk); cy(x, 0.02, z - 0.62, 0.15, 0.03, mBlk); cy(x, 0.25, z - 0.62, 0.12, 0.012, mBlk); hit(x - 0.16, x + 0.16, z - 0.78, z - 0.46); }
+      bx(a, b, 1.45, 1.48, z - 0.16, z, mWal); for (let i = 0; i < 4; i++) cy(a + 0.15 + i * 0.14, 1.525, z - 0.08, 0.04, 0.09, [mWht, mTerra, mOlive, mCream][i]); cy(b - 0.2, 1.55, z - 0.08, 0.05, 0.14, mSteel2);
+      cy(a + 0.5, 0.955, z - 0.2, 0.09, 0.03, mWht); ball(a + 0.5, 0.99, z - 0.2, 0.04, mOrange); cy(b - 0.3, 0.985, z - 0.18, 0.035, 0.09, mWht); hit(a, b, z - 0.38, z);
+      const GK = 2.55; bx(r.x0, r.x1, GK, GK + 0.05, r.z0, r.z1, S({ color: 0xf4f2ec, roughness: 0.95 }));
+      [[0.8, 0.8, 1.1], [1.87, 0.8, 0], [2.94, 0.8, 1.1], [0.8, 2.1, 0], [1.87, 2.1, 1.1], [2.94, 2.1, 0]].forEach(([dx, dz, I]) => { const x = r.x0 + dx, zz = r.z0 + dz; cy(x, GK - 0.004, zz, 0.055, 0.012, mWht); const disc = cy(x, GK - 0.006, zz, 0.04, 0.014, new THREE.MeshBasicMaterial({ color: 0xfff4d6 }));
+        let L = { intensity: 0 }; if (I) { L = new THREE.PointLight(0xfff1dc, I, 5.5, 1.8); L.position.set(x, GK - 0.25, zz); W.add(L); } lamps.push({ L, glass: disc, I, on: true, room: 'kit', decor: true }); }); }
+    { // الماستر: 3 لوحات فوق ضهر السرير
+      const xe = E('master').x1, bc = (4.72 * K + 6.99 * K) / 2;
+      [[-0.62, mCream], [-0.2, mOlive], [0.22, mCream]].forEach(([dz, m], i) => { bx(xe - 0.02, xe, 1.32, 1.82, bc + dz, bc + dz + 0.4, mBlk); bx(xe - 0.024, xe - 0.02, 1.35, 1.79, bc + dz + 0.03, bc + dz + 0.37, m); cy(xe - 0.026, 1.6, bc + dz + 0.2, 0.08, 0.004, i === 1 ? mCream : mTerra, W, 'x'); }); }
+    { // أوضة الأطفال: نجوم وقمر على حيطة السرير الجراي
+      const r = E('bed'), x = r.x1 - 0.012, mSt = new THREE.MeshBasicMaterial({ color: 0xffd76a });
+      const star = (z, y, rad) => { const sh = new THREE.Shape(); for (let i = 0; i < 10; i++) { const an = i * Math.PI / 5 + Math.PI / 2, rr = i % 2 ? rad * 0.45 : rad; i ? sh.lineTo(Math.cos(an) * rr, Math.sin(an) * rr) : sh.moveTo(Math.cos(an) * rr, Math.sin(an) * rr); } const g = new THREE.Mesh(new THREE.ShapeGeometry(sh), mSt); g.rotation.y = -Math.PI / 2; g.position.set(x, y, z); W.add(g); };
+      [[1.6, 2.2, 0.09], [2.0, 2.42, 0.06], [2.45, 2.15, 0.07], [2.75, 2.4, 0.1], [2.2, 2.0, 0.05], [1.3, 2.38, 0.05]].forEach(([dz, y, rad]) => star(r.z0 + dz, y, rad));
+      cy(x - 0.002, 2.3, r.z0 + 0.95, 0.13, 0.004, new THREE.MeshBasicMaterial({ color: 0xfff1c0 }), W, 'x'); }
+    { // الجيمنج: سماعتين على المكتب + وحدة أدراج تحته + مج
+      const r = E('office'), xe = r.x1, zN = r.z0, dx0 = xe - 1.45, dx1 = xe - 0.25, mx = (dx0 + dx1) / 2 - 0.1;
+      for (const sg of [-1, 1]) { bx(mx + sg * 0.46 - 0.05, mx + sg * 0.46 + 0.05, 0.75, 0.93, zN + 0.1, zN + 0.2, mBlk); cy(mx + sg * 0.46, 0.87, zN + 0.202, 0.03, 0.004, mSteel2, W, 'z'); }
+      bx(dx0 + 0.08, dx0 + 0.46, 0.05, 0.62, zN + 0.08, zN + 0.52, mBlk); for (const y of [0.24, 0.43]) bx(dx0 + 0.1, dx0 + 0.44, y, y + 0.006, zN + 0.52, zN + 0.523, mWal);
+      cy(dx1 - 0.12, 0.80, zN + 0.42, 0.04, 0.1, mWht); }
+    { // التراس: أبليك حيطة جنب الباب — السلم: رقم الشقة جنب الباب
+      const r = E('terr'); bx(r.x0 + 2.45, r.x0 + 2.57, 1.9, 2.12, r.z0, r.z0 + 0.1, mBlk); bx(r.x0 + 2.47, r.x0 + 2.55, 1.93, 2.06, r.z0 + 0.1, r.z0 + 0.104, mWarm);
+      const a = D.entrance.a * K; bx(a - 0.30, a - 0.14, 1.55, 1.66, -0.186, -0.17, S({ color: 0xb08d3c, roughness: 0.35, metalness: 0.8 })); }
     // ---------- الحمام ----------
     { const r = E('bath'), sx = 4.68 * K, tx = 3.98 * K, zN = r.z0;
       cy(tx + 0.33, 0.03, zN + 0.12, 0.055, 0.06, mWht); cy(tx + 0.33, 0.22, zN + 0.12, 0.012, 0.38, mWht);
