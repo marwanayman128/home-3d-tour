@@ -715,7 +715,7 @@ trims(R.office, { skirt: M.skWood, gaps: { N: [gp(D.office)] } });
    ===================================================================== */
 door({ wall: 'x', ...D.entrance, c0: -0.17, c1: 0.03, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 100, label: 'باب الشقة', peep: true });
 door({ wall: 'x', ...D.kitchen,  c0: 3.05, c1: 3.20, hinge: 'b', swing: -1, kind: 'wood', open: true, deg: 90,  label: 'باب المطبخ', sill: M.kfloor });
-door({ wall: 'x', ...D.bath,     c0: 3.05, c1: 3.20, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 112, label: 'باب الحمام', sill: M.bfloor });
+door({ wall: 'x', ...D.bath,     c0: 3.05, c1: 3.20, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 168, label: 'باب الحمام', sill: M.bfloor });
 door({ wall: 'x', ...D.bed,      c0: 4.20, c1: 4.35, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 88,  label: 'باب أوضة الأطفال' });
 door({ wall: 'x', ...D.office,   c0: 4.20, c1: 4.35, hinge: 'a', swing: +1, kind: 'wood', open: true, deg: 88,  label: 'باب الجيمنج روم' });
 door({ wall: 'z', ...D.master,   c0: 3.80, c1: 3.95, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 88,  label: 'باب الماستر' });
@@ -1265,10 +1265,12 @@ const decor = new THREE.Group(); scene.add(decor);
     bx(r.x0, r.x0 + 0.2, 1.35, 1.38, r.z0 + 1.55, r.z0 + 2.55, mWal); for (let i = 0; i < 7; i++) bx(r.x0 + 0.03, r.x0 + 0.17, 1.38, 1.56 + (i % 3) * 0.03, r.z0 + 1.61 + i * 0.07, r.z0 + 1.66 + i * 0.07, [mBlue, mYel, mRed, mOlive][i % 4]);
   }
   // =================== المطبخ ===================
-  // التوزيع: الحوض في مكانه — البوتاجاز والشفاط في نص الحيطة البعيدة — وحدة تخزين وبعدها التلاجة على الحيطة الشرقية جنب فيشها — الغسالة في الحمام عند مخارجها
+  // التوزيع: الحوض في مكانه — البوتاجاز والشفاط في نص الحيطة البعيدة — الغسالة تحت الرخامة جنب الحوض (مية وصرف) — وحدة تخزين وبعدها التلاجة على الحيطة الشرقية جنب فيشها
   { const r = E('kit'), cab = (x0, x1, z0, z1, mat, hz) => { bx(x0, x1, 0.10, 0.84, z0, z1, mat); const horiz = (x1 - x0) > (z1 - z0), n = Math.max(1, Math.round((horiz ? x1 - x0 : z1 - z0) / 0.5));
       for (let i = 1; i < n; i++) horiz ? bx(x0 + (x1 - x0) * i / n - 0.002, x0 + (x1 - x0) * i / n + 0.002, 0.12, 0.82, hz, hz + 0.003, mBlk) : bx(hz, hz + 0.003, 0.12, 0.82, z0 + (z1 - z0) * i / n - 0.002, z0 + (z1 - z0) * i / n + 0.002, mBlk); };
-    cab(r.x0, r.x0 + 0.58, r.z0 + 0.95, r.z1, mWal, r.x0 + 0.58); bx(r.x0 + 0.05, r.x0 + 0.53, 0, 0.10, r.z0 + 0.97, r.z1, mBlk);
+    cab(r.x0, r.x0 + 0.58, r.z0 + 0.95, r.z0 + 1.97, mWal, r.x0 + 0.58); cab(r.x0, r.x0 + 0.58, r.z0 + 2.57, r.z1, mWal, r.x0 + 0.58);
+    { const w0 = r.z0 + 1.97;                                           // الغسالة تحت الرخامة جنب الحوض على طول (نفس خط المية والصرف)
+      bx(r.x0 + 0.02, r.x0 + 0.6, 0, 0.85, w0, w0 + 0.6, mWht); cy(r.x0 + 0.605, 0.45, w0 + 0.3, 0.2, 0.02, mSteel2, W, 'x'); cy(r.x0 + 0.612, 0.45, w0 + 0.3, 0.15, 0.02, mScr, W, 'x'); bx(r.x0 + 0.6, r.x0 + 0.603, 0.74, 0.82, w0 + 0.05, w0 + 0.55, mBlk); } bx(r.x0 + 0.05, r.x0 + 0.53, 0, 0.10, r.z0 + 0.97, r.z1, mBlk);
     bx(r.x0, r.x0 + 0.62, 0.86, 0.90, r.z0 + 2.05, r.z1, mStone); bx(r.x0 + 0.53, r.x0 + 0.62, 0.84, 0.90, r.z0 + 0.95, r.z0 + 2.05, mStone);
     bx(r.x0, r.x0 + 0.35, 1.56, 2.32, r.z0 + 0.95, r.z1, mWht); for (let i = 1; i < 4; i++) bx(r.x0 + 0.35, r.x0 + 0.353, 1.58, 2.3, r.z0 + 0.95 + i * 0.57, r.z0 + 0.954 + i * 0.57, mBlk);
     hit(r.x0, r.x0 + 0.62, r.z0 + 0.95, r.z1);
@@ -1297,8 +1299,6 @@ const decor = new THREE.Group(); scene.add(decor);
     // فوطة الاستحمام على الحيطة الشرقية جنب ضلفة الكابينة (فوق السبت) + فوطة إيد على ذراع الحوض
     bx(r.x1 - 0.05, r.x1 - 0.02, 1.52, 1.56, zN + 0.08, zN + 0.58, mBlk); bx(r.x1 - 0.07, r.x1 - 0.05, 1.02, 1.54, zN + 0.12, zN + 0.54, mCream);
     bx(5.55 * K - 0.13, 5.55 * K + 0.13, 0.80, 1.137, zN + 0.046, zN + 0.084, mCream);
-    // الغسالة في مكان مخارجها (الحيطة الغربية جنب الباب: محبسين + صرف + فيشة)
-    { const wz = r.z1 - 0.66; bx(r.x0 + 0.02, r.x0 + 0.6, 0, 0.85, wz, wz + 0.6, mWht); cy(r.x0 + 0.605, 0.45, wz + 0.3, 0.2, 0.02, mSteel2, W, 'x'); cy(r.x0 + 0.612, 0.45, wz + 0.3, 0.15, 0.02, mScr, W, 'x'); bx(r.x0 + 0.6, r.x0 + 0.603, 0.74, 0.82, wz + 0.05, wz + 0.55, mBlk); hit(r.x0, r.x0 + 0.6, wz, wz + 0.6); }
     // سقف جبس بورد + سبوتات + شفاط
     { const GB = 2.50, zc = (r.z0 + r.z1) / 2, mGypB = S({ color: 0xf4f2ec, roughness: 0.95 }), mSlit = S({ color: 0x4d5054, roughness: 0.8 });
       bx(r.x0, r.x1, GB, GB + 0.05, r.z0, r.z1, mGypB);
