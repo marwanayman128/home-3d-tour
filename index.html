@@ -715,7 +715,7 @@ trims(R.office, { skirt: M.skWood, gaps: { N: [gp(D.office)] } });
    ===================================================================== */
 door({ wall: 'x', ...D.entrance, c0: -0.17, c1: 0.03, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 100, label: 'باب الشقة', peep: true });
 door({ wall: 'x', ...D.kitchen,  c0: 3.05, c1: 3.20, hinge: 'b', swing: -1, kind: 'wood', open: true, deg: 90,  label: 'باب المطبخ', sill: M.kfloor });
-door({ wall: 'x', ...D.bath,     c0: 3.05, c1: 3.20, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 168, label: 'باب الحمام', sill: M.bfloor });
+door({ wall: 'x', ...D.bath,     c0: 3.05, c1: 3.20, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 112, label: 'باب الحمام', sill: M.bfloor });
 door({ wall: 'x', ...D.bed,      c0: 4.20, c1: 4.35, hinge: 'b', swing: +1, kind: 'wood', open: true, deg: 88,  label: 'باب أوضة الأطفال' });
 door({ wall: 'x', ...D.office,   c0: 4.20, c1: 4.35, hinge: 'a', swing: +1, kind: 'wood', open: true, deg: 88,  label: 'باب الجيمنج روم' });
 door({ wall: 'z', ...D.master,   c0: 3.80, c1: 3.95, hinge: 'a', swing: -1, kind: 'wood', open: true, deg: 88,  label: 'باب الماستر' });
@@ -1163,10 +1163,11 @@ const decor = new THREE.Group(); scene.add(decor);
     cy(tx, 0.84, tz, 0.11, 0.18, mPot, W, 'y', 0.07); for (let i = 0; i < 6; i++) cushion(tx + Math.cos(i) * 0.07, 1.0 + (i % 3) * 0.06, tz + Math.sin(i) * 0.07, 0.07, 0.03, 0.04, mLeaf);
     for (const dx of [-0.45, 0, 0.45]) { bx(tx + dx - 0.003, tx + dx + 0.003, 1.62, H, tz - 0.003, tz + 0.003, mBlk); cy(tx + dx, 1.55, tz, 0.09, 0.14, mBlk, W, 'y', 0.05); cy(tx + dx, 1.478, tz, 0.045, 0.01, new THREE.MeshBasicMaterial({ color: 0xffe2a8 })); }
     hit(tx - 0.8, tx + 0.8, tz - 0.45, tz + 0.45);
-    bx(r.x0, r.x0 + 0.45, 0.14, 0.85, tz - 0.8, tz + 0.8, mWal); bx(r.x0 + 0.04, r.x0 + 0.41, 0, 0.14, tz - 0.74, tz + 0.74, mBlk); for (const dz of [-0.4, 0, 0.4]) bx(r.x0 + 0.45, r.x0 + 0.454, 0.18, 0.82, tz + dz - 0.003, tz + dz + 0.003, mBlk);
-    cy(r.x0 + 0.22, 0.99, tz - 0.5, 0.07, 0.28, mBlk, W, 'y', 0.05); cy(r.x0 + 0.22, 0.93, tz + 0.5, 0.09, 0.16, mTerra, W, 'y', 0.06);
-    { const fz = [[-0.55, -0.05], [0.05, 0.55]]; for (const [a, b] of fz) { bx(r.x0, r.x0 + 0.02, 1.25, 1.95, tz + a, tz + b, mBlk); bx(r.x0 + 0.02, r.x0 + 0.024, 1.28, 1.92, tz + a + 0.03, tz + b - 0.03, mCream); } }
-    hit(r.x0, r.x0 + 0.45, tz - 0.8, tz + 0.8);
+    const bz = tz + 0.14;                                              // البوفيه 1.40م بين فيشتين الحيطة الغربية (مش مغطي ولا واحدة)
+    bx(r.x0, r.x0 + 0.45, 0.14, 0.85, bz - 0.7, bz + 0.7, mWal); bx(r.x0 + 0.04, r.x0 + 0.41, 0, 0.14, bz - 0.64, bz + 0.64, mBlk); for (const dz of [-0.35, 0, 0.35]) bx(r.x0 + 0.45, r.x0 + 0.454, 0.18, 0.82, bz + dz - 0.003, bz + dz + 0.003, mBlk);
+    cy(r.x0 + 0.22, 0.99, bz - 0.45, 0.07, 0.28, mBlk, W, 'y', 0.05); cy(r.x0 + 0.22, 0.93, bz + 0.45, 0.09, 0.16, mTerra, W, 'y', 0.06);
+    { const fz = [[-0.55, -0.05], [0.05, 0.55]]; for (const [a, b] of fz) { bx(r.x0, r.x0 + 0.02, 1.25, 1.95, bz + a, bz + b, mBlk); bx(r.x0 + 0.02, r.x0 + 0.024, 1.28, 1.92, bz + a + 0.03, bz + b - 0.03, mCream); } }
+    hit(r.x0, r.x0 + 0.45, bz - 0.7, bz + 0.7);
     // ركنة L قصاد التلفزيون (الحيطة الشرقية)
     const sx0 = r.x0 + 2.25, sz0 = r.z1 - 3.15, sz1 = r.z1 - 0.45;
     bx(sx0, sx0 + 0.95, 0.10, 0.40, sz0, sz1, mSofa); bx(sx0, sx0 + 0.22, 0.40, 0.84, sz0, sz1, mSofa2); bx(sx0, sx0 + 0.95, 0.40, 0.62, sz0, sz0 + 0.2, mSofa2);
@@ -1251,20 +1252,20 @@ const decor = new THREE.Group(); scene.add(decor);
     for (const dx of [0.82, 0.92]) bx(r.x0 + dx, r.x0 + dx + 0.015, 0.9, 1.2, r.z0 + 0.55, r.z0 + 0.57, mWal); hit(r.x0 + 0.38, r.x0 + 1.38, r.z0, r.z0 + 0.55);
     const bw = 0.98, x0 = r.x1 - bw, b1 = r.z1 - 0.06, b0 = b1 - 2.0;
     for (const [a, b] of [[x0, b0], [r.x1 - 0.06, b0], [x0, b1 - 0.06], [r.x1 - 0.06, b1 - 0.06]]) bx(a, a + 0.06, 0, 1.78, b, b + 0.06, mWal);
-    for (const [yb, col] of [[0.25, mBlue], [1.22, mYel]]) { bx(x0, r.x1, yb, yb + 0.08, b0, b1, mWal); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.08, yb + 0.22, b0 + 0.06, b1 - 0.06, mWht); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.22, yb + 0.27, b0 + 0.06, b1 - 0.6, col); cushion(x0 + bw / 2, yb + 0.29, b1 - 0.3, 0.3, 0.06, 0.17, mWht); }
-    bx(x0, x0 + 0.03, 1.48, 1.53, b0 + 0.5, b1, mWal); bx(x0, x0 + 0.03, 1.62, 1.67, b0 + 0.5, b1, mWal); bx(x0, r.x1, 1.48, 1.67, b0, b0 + 0.03, mWal);
-    for (let i = 0; i < 4; i++) bx(x0 - 0.04, x0, 0.33 + i * 0.3, 0.36 + i * 0.3, b0 + 0.08, b0 + 0.42, mWal); bx(x0 - 0.04, x0, 0, 1.5, b0 + 0.06, b0 + 0.1, mWal); bx(x0 - 0.04, x0, 0, 1.5, b0 + 0.4, b0 + 0.44, mWal);
+    for (const [yb, col] of [[0.25, mBlue], [1.22, mYel]]) { bx(x0, r.x1, yb, yb + 0.08, b0, b1, mWal); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.08, yb + 0.22, b0 + 0.06, b1 - 0.06, mWht); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.22, yb + 0.27, b0 + 0.6, b1 - 0.06, col); cushion(x0 + bw / 2, yb + 0.29, b0 + 0.3, 0.3, 0.06, 0.17, mWht); }
+    bx(x0, x0 + 0.03, 1.48, 1.53, b0, b1 - 0.5, mWal); bx(x0, x0 + 0.03, 1.62, 1.67, b0, b1 - 0.5, mWal); bx(x0, r.x1, 1.48, 1.67, b0, b0 + 0.03, mWal);
+    for (let i = 0; i < 4; i++) bx(x0 - 0.04, x0, 0.33 + i * 0.3, 0.36 + i * 0.3, b1 - 0.42, b1 - 0.08, mWal); bx(x0 - 0.04, x0, 0, 1.5, b1 - 0.44, b1 - 0.4, mWal); bx(x0 - 0.04, x0, 0, 1.5, b1 - 0.1, b1 - 0.06, mWal);
     hit(x0 - 0.04, r.x1, b0, b1);
     const dx0 = r.x0 + 0.76, dx1 = dx0 + 1.0;
     bx(dx0, dx1, 0.72, 0.75, r.z1 - 0.5, r.z1, mWal); bx(dx0, dx0 + 0.03, 0, 0.72, r.z1 - 0.5, r.z1, mWht); bx(dx1 - 0.35, dx1, 0.1, 0.72, r.z1 - 0.5, r.z1, mWht); bx(dx1 - 0.35, dx1 - 0.346, 0.4, 0.41, r.z1 - 0.5, r.z1 - 0.497, mBlk);
-    chair(dx0 + 0.35, r.z1 - 0.72, Math.PI, mBlue); cy(dx0 + 0.15, 0.76, r.z1 - 0.15, 0.06, 0.02, mBlk); cy(dx0 + 0.15, 0.93, r.z1 - 0.15, 0.008, 0.32, mBlk); cy(dx0 + 0.15, 1.1, r.z1 - 0.2, 0.07, 0.1, mYel, W, 'y', 0.04);
+    chair(dx0 + 0.35, r.z1 - 0.72, Math.PI, mBlue); cy(dx0 + 0.15, 0.76, r.z1 - 0.15, 0.06, 0.02, mBlk); cy(dx0 + 0.15, 0.84, r.z1 - 0.15, 0.008, 0.16, mBlk); cy(dx0 + 0.15, 0.945, r.z1 - 0.2, 0.07, 0.07, mYel, W, 'y', 0.04);
     hit(dx0, dx1, r.z1 - 0.5, r.z1);
     cy(r.x0 + 1.5, 0.008, r.z0 + 2.0, 0.7, 0.014, mBlue); cy(r.x0 + 1.5, 0.012, r.z0 + 2.0, 0.5, 0.014, mCream);
     bx(r.x0, r.x0 + 0.42, 0, 0.4, r.z0 + 1.75, r.z0 + 2.35, mYel); bx(r.x0, r.x0 + 0.43, 0.4, 0.44, r.z0 + 1.74, r.z0 + 2.36, mWal); hit(r.x0, r.x0 + 0.43, r.z0 + 1.75, r.z0 + 2.35);
     bx(r.x0, r.x0 + 0.2, 1.35, 1.38, r.z0 + 1.55, r.z0 + 2.55, mWal); for (let i = 0; i < 7; i++) bx(r.x0 + 0.03, r.x0 + 0.17, 1.38, 1.56 + (i % 3) * 0.03, r.z0 + 1.61 + i * 0.07, r.z0 + 1.66 + i * 0.07, [mBlue, mYel, mRed, mOlive][i % 4]);
   }
   // =================== المطبخ ===================
-  // التوزيع: الحوض في مكانه — البوتاجاز والشفاط في نص الحيطة البعيدة — الغسالة وبعدها التلاجة على الحيطة الشرقية ووشهم على الممر (باب التلاجة بيفتح من غير ما حاجة تسده)
+  // التوزيع: الحوض في مكانه — البوتاجاز والشفاط في نص الحيطة البعيدة — وحدة تخزين وبعدها التلاجة على الحيطة الشرقية جنب فيشها — الغسالة في الحمام عند مخارجها
   { const r = E('kit'), cab = (x0, x1, z0, z1, mat, hz) => { bx(x0, x1, 0.10, 0.84, z0, z1, mat); const horiz = (x1 - x0) > (z1 - z0), n = Math.max(1, Math.round((horiz ? x1 - x0 : z1 - z0) / 0.5));
       for (let i = 1; i < n; i++) horiz ? bx(x0 + (x1 - x0) * i / n - 0.002, x0 + (x1 - x0) * i / n + 0.002, 0.12, 0.82, hz, hz + 0.003, mBlk) : bx(hz, hz + 0.003, 0.12, 0.82, z0 + (z1 - z0) * i / n - 0.002, z0 + (z1 - z0) * i / n + 0.002, mBlk); };
     cab(r.x0, r.x0 + 0.58, r.z0 + 0.95, r.z1, mWal, r.x0 + 0.58); bx(r.x0 + 0.05, r.x0 + 0.53, 0, 0.10, r.z0 + 0.97, r.z1, mBlk);
@@ -1278,8 +1279,8 @@ const decor = new THREE.Group(); scene.add(decor);
     { const hd = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.44, 0.3, 4), mSteel2); hd.rotation.y = Math.PI / 4; hd.position.set(c0 + 0.3, 1.72, r.z0 + 0.3); W.add(hd); bx(c0 + 0.19, c0 + 0.41, 1.87, H, r.z0 + 0.04, r.z0 + 0.26, mSteel2); bx(c0 - 0.01, c0 + 0.61, 1.55, 1.585, r.z0, r.z0 + 0.61, mSteel2); }
     bx(r.x0 + 0.85, c0 - 0.02, 1.56, 2.32, r.z0, r.z0 + 0.35, mWht); bx(c0 + 0.62, r.x1, 1.56, 2.32, r.z0, r.z0 + 0.35, mWht);
     hit(r.x0 + 0.85, r.x1, r.z0, r.z0 + 0.62);
-    const e0 = r.z0 + 0.64, f0 = r.z0 + 1.30;                       // غسالة ثم تلاجة على الحيطة الشرقية
-    bx(r.x1 - 0.6, r.x1 - 0.02, 0, 0.85, e0, e0 + 0.6, mWht); cy(r.x1 - 0.605, 0.45, e0 + 0.3, 0.2, 0.02, mSteel2, W, 'x'); cy(r.x1 - 0.612, 0.45, e0 + 0.3, 0.15, 0.02, mScr, W, 'x'); bx(r.x1 - 0.603, r.x1 - 0.6, 0.74, 0.82, e0 + 0.05, e0 + 0.55, mBlk);
+    const e0 = r.z0 + 0.64, f0 = r.z0 + 1.30;                       // وحدة تخزين ثم تلاجة على الحيطة الشرقية (فيشة الرخامة فوق الوحدة، وفيشة التلاجة جنبها على طول)
+    cab(r.x1 - 0.58, r.x1, e0 - 0.02, e0 + 0.63, mWal, r.x1 - 0.583); bx(r.x1 - 0.53, r.x1 - 0.05, 0, 0.10, e0, e0 + 0.6, mBlk);
     bx(r.x1 - 0.62, r.x1, 0.86, 0.90, e0 - 0.02, e0 + 0.63, mStone); bx(r.x1 - 0.35, r.x1, 1.56, 2.32, e0 - 0.02, e0 + 0.63, mWht);
     bx(r.x1 - 0.72, r.x1 - 0.02, 0, 1.85, f0, f0 + 0.7, mSteel2); bx(r.x1 - 0.723, r.x1 - 0.72, 1.2, 1.206, f0, f0 + 0.7, mBlk); bx(r.x1 - 0.75, r.x1 - 0.72, 0.7, 1.15, f0 + 0.05, f0 + 0.07, mBlk); bx(r.x1 - 0.75, r.x1 - 0.72, 1.26, 1.6, f0 + 0.05, f0 + 0.07, mBlk);
     hit(r.x1 - 0.72, r.x1, e0 - 0.02, f0 + 0.7);
@@ -1296,6 +1297,8 @@ const decor = new THREE.Group(); scene.add(decor);
     // فوطة الاستحمام على الحيطة الشرقية جنب ضلفة الكابينة (فوق السبت) + فوطة إيد على ذراع الحوض
     bx(r.x1 - 0.05, r.x1 - 0.02, 1.52, 1.56, zN + 0.08, zN + 0.58, mBlk); bx(r.x1 - 0.07, r.x1 - 0.05, 1.02, 1.54, zN + 0.12, zN + 0.54, mCream);
     bx(5.55 * K - 0.13, 5.55 * K + 0.13, 0.80, 1.137, zN + 0.046, zN + 0.084, mCream);
+    // الغسالة في مكان مخارجها (الحيطة الغربية جنب الباب: محبسين + صرف + فيشة)
+    { const wz = r.z1 - 0.66; bx(r.x0 + 0.02, r.x0 + 0.6, 0, 0.85, wz, wz + 0.6, mWht); cy(r.x0 + 0.605, 0.45, wz + 0.3, 0.2, 0.02, mSteel2, W, 'x'); cy(r.x0 + 0.612, 0.45, wz + 0.3, 0.15, 0.02, mScr, W, 'x'); bx(r.x0 + 0.6, r.x0 + 0.603, 0.74, 0.82, wz + 0.05, wz + 0.55, mBlk); hit(r.x0, r.x0 + 0.6, wz, wz + 0.6); }
     // سقف جبس بورد + سبوتات + شفاط
     { const GB = 2.50, zc = (r.z0 + r.z1) / 2, mGypB = S({ color: 0xf4f2ec, roughness: 0.95 }), mSlit = S({ color: 0x4d5054, roughness: 0.8 });
       bx(r.x0, r.x1, GB, GB + 0.05, r.z0, r.z1, mGypB);
@@ -1305,6 +1308,93 @@ const decor = new THREE.Group(); scene.add(decor);
         lamps.push({ L, glass: disc, I, on: true, room: 'bath', decor: true }); }
       const fx = r.x1 - 0.5, fz = zN + 0.4;                                    // شفاط سقف 28×28 جنب الكابينة
       bx(fx - 0.14, fx + 0.14, GB - 0.018, GB, fz - 0.14, fz + 0.14, mWht); for (let i = 0; i < 5; i++) bx(fx - 0.10, fx + 0.10, GB - 0.021, GB - 0.018, fz - 0.105 + i * 0.045, fz - 0.075 + i * 0.045, mSlit); }
+  }
+  // =====================================================================
+  //  تفاصيل إضافية في باقي الأوض (إكسسوارات وديكور حيطان)
+  // =====================================================================
+  { const mWarm = new THREE.MeshBasicMaterial({ color: 0xffe2a8 }), mBrown = S({ color: 0x9a6b43, roughness: 1 }), mOrange = S({ color: 0xe07a2f, roughness: 0.7 });
+    const ball = (x, y, z, rad, mat) => cushion(x, y, z, rad, rad, rad, mat);
+    // ---------- أوضة الأطفال ----------
+    { const r = E('bed'), xw = r.x0;
+      // سلة باسكت على الحيطة الغربية + كورة
+      { const zc = r.z0 + 0.9; bx(xw, xw + 0.02, 1.75, 2.12, zc - 0.26, zc + 0.26, mWht); bx(xw + 0.02, xw + 0.023, 1.80, 1.98, zc - 0.11, zc - 0.095, mRed); bx(xw + 0.02, xw + 0.023, 1.80, 1.98, zc + 0.095, zc + 0.11, mRed); bx(xw + 0.02, xw + 0.023, 1.965, 1.98, zc - 0.11, zc + 0.11, mRed);
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.011, 8, 22), mOrange); ring.rotation.x = Math.PI / 2; ring.position.set(xw + 0.15, 1.80, zc); W.add(ring);
+        const net = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.07, 0.15, 10, 2, true), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })); net.position.set(xw + 0.15, 1.72, zc); W.add(net);
+        ball(xw + 0.55, 0.115, zc + 0.15, 0.115, mOrange); }
+      // حبل أعلام ملونة على الحيطة الغربية
+      { const za = r.z0 + 1.55, zb = r.z1 - 0.3, n = 13, cols = [mRed, mYel, mBlue, mOlive, mTerra]; bx(xw + 0.004, xw + 0.008, 2.232, 2.238, za, zb, mBlk);
+        for (let i = 0; i < n; i++) { const f = new THREE.Mesh(new THREE.CircleGeometry(0.085, 3), cols[i % 5]); f.rotation.set(0, Math.PI / 2, -Math.PI / 2); f.position.set(xw + 0.012, 2.19, za + 0.1 + i * (zb - za - 0.2) / (n - 1)); W.add(f); } }
+      // خريطة العالم على الحيطة الغربية ناحية الشباك
+      { const a = r.z1 - 1.2, b = r.z1 - 0.35; bx(xw, xw + 0.02, 1.15, 1.72, a, b, mWht); bx(xw + 0.02, xw + 0.024, 1.18, 1.69, a + 0.03, b - 0.03, mBlue);
+        for (const [dy, dz, sy, sz] of [[1.52, 0.2, 0.09, 0.08], [1.36, 0.25, 0.07, 0.045], [1.5, 0.45, 0.06, 0.07], [1.36, 0.47, 0.08, 0.05], [1.52, 0.64, 0.08, 0.1], [1.3, 0.7, 0.035, 0.05]]) cushion(xw + 0.025, dy, a + dz, 0.003, sy, sz, mLeaf2); }
+      // مكعبات على الأرض + دبدوب على السرير التحتاني
+      { const z = r.z0 + 2.62; for (const [dx, dz, y, m] of [[0.5, 0, 0, mRed], [0.62, 0.02, 0, mBlue], [0.56, 0.01, 0.1, mYel], [0.8, 0.2, 0, mOlive]]) bx(xw + dx, xw + dx + 0.1, y, y + 0.1, z + dz, z + dz + 0.1, m); }
+      { const tx = r.x1 - 0.49, tz = r.z1 - 1.44, y = 0.52; ball(tx, y + 0.1, tz, 0.095, mBrown); ball(tx, y + 0.24, tz, 0.07, mBrown); for (const s of [-1, 1]) { ball(tx + s * 0.055, y + 0.3, tz, 0.026, mBrown); ball(tx + s * 0.1, y + 0.12, tz - 0.03, 0.035, mBrown); ball(tx + s * 0.06, y + 0.03, tz - 0.08, 0.04, mBrown); } ball(tx, y + 0.225, tz - 0.06, 0.028, mCream); }
+      // لابتوب وكتب على المكتب
+      { const dx0 = r.x0 + 0.76, dx1 = dx0 + 1.0; bx(dx0 + 0.42, dx0 + 0.72, 0.75, 0.765, r.z1 - 0.40, r.z1 - 0.20, mSteel2); bx(dx0 + 0.42, dx0 + 0.72, 0.765, 0.96, r.z1 - 0.20, r.z1 - 0.19, mSteel2); bx(dx0 + 0.435, dx0 + 0.705, 0.78, 0.945, r.z1 - 0.203, r.z1 - 0.20, mScr);
+        [mRed, mBlue, mYel].forEach((m, i) => bx(dx1 - 0.3 + i * 0.01, dx1 - 0.08 + i * 0.01, 0.75 + i * 0.03, 0.78 + i * 0.03, r.z1 - 0.36, r.z1 - 0.2, m)); }
+      // ستارة رول صفرا على الشباك
+      { const a = WIN.bed.a * K, b = WIN.bed.b * K, y1 = WIN.bed.y1; bx(a - 0.06, b + 0.06, y1 + 0.02, y1 + 0.10, r.z1 - 0.07, r.z1, mWht); bx(a - 0.04, b + 0.04, y1 - 0.30, y1 + 0.03, r.z1 - 0.035, r.z1 - 0.03, mYel); bx(a - 0.04, b + 0.04, y1 - 0.32, y1 - 0.30, r.z1 - 0.04, r.z1 - 0.025, mWht); }
+    }
+    // ---------- المطبخ ----------
+    { const r = E('kit'), c0 = r.x0 + 1.75, f0 = r.z0 + 1.30, zN = r.z0;
+      // غلاية + برطمانات توابل + ماسورة معالق على الحيطة + بلوك سكاكين
+      cy(r.x0 + 1.08, 0.99, zN + 0.32, 0.07, 0.18, mSteel2, W, 'y', 0.09); cy(r.x0 + 1.08, 1.09, zN + 0.32, 0.02, 0.025, mBlk); bx(r.x0 + 1.16, r.x0 + 1.18, 0.94, 1.07, zN + 0.31, zN + 0.33, mBlk); bx(r.x0 + 1.13, r.x0 + 1.18, 1.05, 1.07, zN + 0.31, zN + 0.33, mBlk);
+      [mTerra, mYel, mOlive, mRed, mCream].forEach((m, i) => { cy(r.x0 + 1.34 + i * 0.075, 0.945, zN + 0.09, 0.028, 0.09, m); cy(r.x0 + 1.34 + i * 0.075, 0.997, zN + 0.09, 0.03, 0.014, mBlk); });
+      cy(r.x0 + 1.3, 1.33, zN + 0.025, 0.007, 0.7, mSteel2, W, 'x'); for (let i = 0; i < 4; i++) { const x = r.x0 + 1.06 + i * 0.16; bx(x, x + 0.014, 1.08, 1.325, zN + 0.02, zN + 0.03, mBlk); bx(x - 0.022, x + 0.036, 1.02, 1.09, zN + 0.02, zN + 0.03, i % 2 ? mSteel2 : mBlk); }
+      bx(c0 - 0.2, c0 - 0.08, 0.90, 1.08, zN + 0.1, zN + 0.26, mWal); for (let i = 0; i < 3; i++) bx(c0 - 0.18 + i * 0.035, c0 - 0.16 + i * 0.035, 1.08, 1.14, zN + 0.13, zN + 0.16, mBlk);
+      // ميكروويف على الرخامة اليمين + فوطة على البوتاجاز
+      bx(c0 + 0.75, c0 + 1.23, 0.90, 1.18, zN + 0.08, zN + 0.44, mBlk); bx(c0 + 0.77, c0 + 1.10, 0.92, 1.16, zN + 0.44, zN + 0.444, mScr); bx(c0 + 1.13, c0 + 1.21, 0.93, 1.15, zN + 0.44, zN + 0.444, mSteel2);
+      bx(c0 + 0.34, c0 + 0.5, 0.42, 0.69, zN + 0.63, zN + 0.642, mCream);
+      // طبق فاكهة + صابون على رخامة الحوض
+      cy(r.x0 + 0.3, 0.935, r.z1 - 0.78, 0.14, 0.07, mWht, W, 'y', 0.08); for (const [a, b, m] of [[-0.05, -0.03, mOrange], [0.05, -0.02, mYel], [0, 0.05, mRed], [0.01, -0.005, mLeaf2]]) ball(r.x0 + 0.3 + a, m === mLeaf2 ? 1.04 : 0.99, r.z1 - 0.78 + b, 0.042, m);
+      cy(r.x0 + 0.1, 0.97, r.z0 + 2.16, 0.028, 0.14, mYel); cy(r.x0 + 0.1, 1.06, r.z0 + 2.16, 0.01, 0.05, mWht); bx(r.x0 + 0.16, r.x0 + 0.25, 0.90, 0.93, r.z0 + 2.12, r.z0 + 2.19, mOlive);
+      // إضاءة LED تحت المطبخ العلوي
+      bx(r.x0 + 0.30, r.x0 + 0.33, 1.548, 1.556, r.z0 + 1.0, r.z1 - 0.05, mWarm); bx(r.x0 + 0.9, c0 - 0.06, 1.548, 1.556, zN + 0.30, zN + 0.33, mWarm); bx(c0 + 0.66, r.x1 - 0.4, 1.548, 1.556, zN + 0.30, zN + 0.33, mWarm);
+      // مغناطيس وورقة على التلاجة
+      { const fx = r.x1 - 0.72; [[1.62, 0.30, mRed], [1.55, 0.44, mYel], [1.66, 0.52, mBlue], [1.48, 0.36, mOlive]].forEach(([y, dz, m]) => bx(fx - 0.006, fx, y, y + 0.05, f0 + dz, f0 + dz + 0.05, m)); bx(fx - 0.004, fx, 1.30, 1.44, f0 + 0.42, f0 + 0.53, mCream); }
+      // ساعة حيطة + مشاية + سلة زبالة
+      { const cx = r.x0 + 1.3, z = r.z1; cy(cx, 1.95, z - 0.015, 0.16, 0.03, mBlk, W, 'z'); cy(cx, 1.95, z - 0.032, 0.145, 0.004, mWht, W, 'z'); bx(cx - 0.006, cx + 0.006, 1.95, 2.05, z - 0.038, z - 0.034, mBlk); bx(cx, cx + 0.075, 1.944, 1.956, z - 0.038, z - 0.034, mBlk); }
+      { const cx = (r.x0 + 0.62 + r.x1 - 0.72) / 2; bx(cx - 0.38, cx + 0.38, 0.002, 0.012, r.z0 + 0.95, r.z1 - 0.55, mCream); for (const dz of [0.12, 0.24, -0.12, -0.24]) { const z = dz > 0 ? r.z0 + 0.95 + dz : r.z1 - 0.55 + dz; bx(cx - 0.38, cx + 0.38, 0.012, 0.014, z - 0.03, z + 0.03, mTerra); } }
+      cy(r.x0 + 2.3, 0.2, r.z1 - 0.2, 0.13, 0.4, mSteel2); cy(r.x0 + 2.3, 0.41, r.z1 - 0.2, 0.135, 0.02, mBlk); hit(r.x0 + 2.17, r.x0 + 2.43, r.z1 - 0.33, r.z1 - 0.07);
+    }
+    // ---------- الطرقة ----------
+    { const r = E('corr'), zc = (r.z0 + r.z1) / 2;
+      [[r.x0 + 3.85, mCream, mTerra], [r.x0 + 4.35, mOlive, mCream], [r.x0 + 4.85, mTerra, mBlk]].forEach(([x, col, c2]) => { frame(x, x + 0.4, 1.25, 1.8, r.z0, col); cy(x + 0.2, 1.58, r.z0 + 0.026, 0.085, 0.004, c2, W, 'z'); bx(x + 0.1, x + 0.3, 1.33, 1.36, r.z0 + 0.024, r.z0 + 0.027, c2); });
+      bx(r.x0 + 1.0, r.x1 - 0.5, 0.002, 0.012, zc - 0.3, zc + 0.3, mJute); for (const s of [-1, 1]) bx(r.x0 + 1.0, r.x1 - 0.5, 0.012, 0.014, zc + s * 0.24 - 0.012, zc + s * 0.24 + 0.012, mWal);
+      // كونسول معلق رفيع + مراية مدورة + فازة على الحيطة الجنوبية
+      { const a = r.x0 + 1.0, b = a + 0.9, m = (a + b) / 2; bx(a, b, 0.85, 0.89, r.z1 - 0.18, r.z1, mWal); cy(m, 1.52, r.z1 - 0.012, 0.28, 0.022, mBlk, W, 'z'); cy(m, 1.52, r.z1 - 0.026, 0.26, 0.006, mMirror, W, 'z');
+        cy(a + 0.18, 0.99, r.z1 - 0.09, 0.04, 0.2, mTerra, W, 'y', 0.055); cy(b - 0.2, 0.90, r.z1 - 0.09, 0.07, 0.025, mWht, W, 'y', 0.05); hit(a, b, r.z1 - 0.18, r.z1); }
+    }
+    // ---------- التراس ----------
+    { const r = E('terr'), tx = r.x1 - 0.85, tz = r.z0 + 0.6;
+      cy(tx, 0.015, tz, 0.2, 0.03, mBlk); cy(tx, 0.36, tz, 0.02, 0.69, mBlk); cy(tx, 0.715, tz, 0.3, 0.03, mWht); cy(tx + 0.08, 0.77, tz - 0.05, 0.035, 0.08, mTerra); hit(tx - 0.3, tx + 0.3, tz - 0.3, tz + 0.3);
+      chair(tx - 0.57, tz, -Math.PI / 2, mOlive); chair(tx + 0.57, tz, Math.PI / 2, mOlive);
+      { const a = r.x0 + 0.2, b = r.x0 + 1.9, z0 = r.z1 - 0.26, z1 = r.z1 - 0.06; bx(a, b, 0, 0.3, z0, z1, mPot); bx(a + 0.02, b - 0.02, 0.3, 0.31, z0 + 0.02, z1 - 0.02, mBrown);
+        for (let i = 0; i < 14; i++) { const x = a + 0.1 + i * (b - a - 0.2) / 13; cushion(x, 0.38 + (i % 3) * 0.05, (z0 + z1) / 2 + Math.sin(i * 2.1) * 0.04, 0.09, 0.05, 0.07, i % 2 ? mLeaf : mLeaf2); if (i % 3 === 1) ball(x, 0.5, (z0 + z1) / 2, 0.03, i % 2 ? mRed : mYel); } }
+      plant(r.x0 + 0.3, r.z0 + 0.3, 1.1);
+    }
+    // ---------- الريسبشن ----------
+    { const r = E('rec'), tx = r.x0 + 1.75, tz = r.z0 + 1.75, sx0 = r.x0 + 2.25, sz0 = r.z1 - 3.15, sz1 = r.z1 - 0.45, tvz = (sz0 + sz1) / 2 - 0.25;
+      // ساوند بار + كتب وفازة على وحدة التلفزيون
+      bx(r.x1 - 0.14, r.x1 - 0.06, 0.58, 0.65, tvz - 0.23, tvz + 0.67, mBlk);
+      [mOlive, mCream, mTerra].forEach((m, i) => bx(r.x1 - 0.34 + i * 0.01, r.x1 - 0.12, 0.58 + i * 0.03, 0.61 + i * 0.03, tvz + 0.72 + i * 0.01, tvz + 0.98 - i * 0.01, m));
+      cy(r.x1 - 0.26, 0.70, tvz - 0.84, 0.05, 0.24, mTerra, W, 'y', 0.075); for (let i = 0; i < 4; i++) { const st = cy(r.x1 - 0.26 + Math.cos(i * 1.7) * 0.03, 1.0, tvz - 0.84 + Math.sin(i * 1.7) * 0.03, 0.004, 0.42, mBrown); st.rotation.set(Math.sin(i * 1.7) * 0.18, 0, -Math.cos(i * 1.7) * 0.18 - 0.1); }
+      // سجادة تحت السفرة + 3 لوحات على الحيطة الشمالية وراها
+      bx(tx - 1.15, tx + 1.15, 0.002, 0.012, tz - 1.1, tz + 1.1, mRug);
+      [[tx - 0.85, mOlive, mCream], [tx - 0.25, mCream, mTerra], [tx + 0.35, mTerra, mCream]].forEach(([x, col, c2]) => { frame(x, x + 0.5, 1.2, 2.05, r.z0, col); cy(x + 0.25, 1.72, r.z0 + 0.026, 0.12, 0.004, c2, W, 'z'); bx(x + 0.1, x + 0.4, 1.32, 1.36, r.z0 + 0.024, r.z0 + 0.027, c2); bx(x + 0.1, x + 0.4, 1.4, 1.42, r.z0 + 0.024, r.z0 + 0.027, c2); });
+      // أباجورة أرضية عند طرف الركنة ناحية الشباك (جنب فيشة الحيطة الجنوبية ومش في طريق المشي) + بطانية على الركنة + دواسة عند باب الشقة
+      { const lx = sx0 + 2.27, lz = sz1 - 0.2; cy(lx, 0.015, lz, 0.15, 0.03, mBlk); cy(lx, 0.8, lz, 0.012, 1.55, mBlk); cy(lx, 1.68, lz, 0.13, 0.26, mCream, W, 'y', 0.19); cy(lx, 1.56, lz, 0.1, 0.01, mWarm); hit(lx - 0.15, lx + 0.15, lz - 0.15, lz + 0.15); }
+      bx(sx0 + 1.5, sx0 + 1.92, 0.50, 0.525, sz1 - 0.88, sz1 - 0.3, mOlive); bx(sx0 + 1.5, sx0 + 1.92, 0.2, 0.52, sz1 - 0.915, sz1 - 0.9, mOlive);
+      bx(D.entrance.a * K + 0.18, D.entrance.b * K - 0.18, 0.002, 0.014, r.z0 + 0.12, r.z0 + 0.6, mJute);
+    }
+    // ---------- الحمام ----------
+    { const r = E('bath'), sx = 4.95 * K, tx = 4.25 * K, zN = r.z0;
+      cy(tx - 0.34, 0.03, zN + 0.12, 0.055, 0.06, mWht); cy(tx - 0.34, 0.22, zN + 0.12, 0.012, 0.38, mWht);
+      cy(sx + 0.42, 0.13, zN + 0.15, 0.09, 0.26, mSteel2); cy(sx + 0.42, 0.265, zN + 0.15, 0.093, 0.012, mBlk);
+      cy(sx + 0.1, 1.40, zN + 0.06, 0.028, 0.08, mWht); for (const [d, m] of [[-0.012, mBlue], [0.012, mRed]]) { const b = cy(sx + 0.1 + d, 1.47, zN + 0.06, 0.004, 0.14, m); b.rotation.z = -d * 12; }
+      bx(r.x1 - 0.22, r.x1, 1.10, 1.115, r.z1 - 0.22, r.z1, mSteel2); cy(r.x1 - 0.08, 1.19, r.z1 - 0.08, 0.03, 0.15, mBlue); cy(r.x1 - 0.16, 1.18, r.z1 - 0.07, 0.028, 0.13, mWht); cy(r.x1 - 0.07, 1.17, r.z1 - 0.16, 0.026, 0.11, mOlive);
+    }
   }
 }
 
