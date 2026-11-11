@@ -1193,25 +1193,38 @@ const decor = new THREE.Group(); scene.add(decor);
     plant(r.x0 + 0.38, r.z0 + 0.38, 1.35); plant(r.x1 - 0.35, tvz - 1.4, 1.1); plant(r.x0 + 0.4, r.z1 - 0.4, 1.5); plant(r.x1 - 0.35, tvz + 1.4, 0.9);
   }
   // =================== الجيمنج روم ===================
-  // التوزيع: التلفزيون جنب الباب — المكتب على الحيطة الشرقية (عندها 3 فيش) — أنتريه كورنر في الركن الجنوبي الغربي (ضلع ورا الكرسي وضلع قصاد التلفزيون)
-  { const r = E('office'), tx = r.x1 - 0.90;   // البانوه بين مفتاح النور (جنب الباب) والعمود — مش مغطي المفتاح ولا الفيشة ولا العلبة العالية
-    bx(tx - 0.74, tx + 0.74, 0, 2.05, r.z0, r.z0 + 0.025, mBlk); for (let i = 0; i < 5; i++) bx(tx - 0.74 + i * 0.05, tx - 0.71 + i * 0.05, 0, 2.05, r.z0 + 0.025, r.z0 + 0.05, mWal);
-    bx(tx - 0.66, tx + 0.66, 0.22, 0.52, r.z0, r.z0 + 0.36, mBlk); bx(tx - 0.66, tx + 0.66, 0.21, 0.22, r.z0 + 0.34, r.z0 + 0.36, mCyan); tv(tx + 0.13, r.z0 + 0.03, 1.11, 'S', 0.85);
-    bx(tx - 0.55, tx - 0.25, 0.52, 0.58, r.z0 + 0.08, r.z0 + 0.3, mWht); hit(tx - 0.66, tx + 0.66, r.z0, r.z0 + 0.36);
-    // ديسك 120 على الحيطة الشرقية + شاشة + كيسة + كرسي جيمنج
-    const d0 = r.z0 + 1.35, d1 = d0 + 1.2, xe = r.x1;
-    bx(xe - 0.6, xe, 0.72, 0.75, d0, d1, mBlk); for (const dz of [d0 + 0.03, d1 - 0.07]) { bx(xe - 0.07, xe - 0.03, 0, 0.72, dz, dz + 0.04, mBlk); bx(xe - 0.57, xe - 0.53, 0, 0.72, dz, dz + 0.04, mBlk); }
-    bx(xe - 0.02, xe - 0.01, 0.70, 0.71, d0, d1, mCyan); bx(xe - 0.15, xe - 0.12, 0.95, 1.31, d0 + 0.29, d0 + 0.91, mBlk); bx(xe - 0.153, xe - 0.15, 0.965, 1.295, d0 + 0.305, d0 + 0.895, mScr);
-    bx(xe - 0.2, xe - 0.1, 0.75, 0.95, d0 + 0.57, d0 + 0.63, mBlk); bx(xe - 0.25, xe - 0.05, 0.75, 0.765, d0 + 0.48, d0 + 0.72, mBlk);
-    bx(xe - 0.47, xe - 0.33, 0.75, 0.77, d0 + 0.38, d0 + 0.82, mBlk); bx(xe - 0.46, xe - 0.34, 0.77, 0.773, d0 + 0.39, d0 + 0.81, mCyan); bx(xe - 0.44, xe - 0.36, 0.75, 0.78, d0 + 0.9, d0 + 0.96, mBlk);
-    bx(xe - 0.52, xe - 0.08, 0.02, 0.48, d1 - 0.3, d1 - 0.09, mBlk); bx(xe - 0.524, xe - 0.52, 0.06, 0.44, d1 - 0.28, d1 - 0.11, mCyan);
-    hit(xe - 0.6, xe, d0, d1);
-    { const g = G2(xe - 1.05, (d0 + d1) / 2, -Math.PI / 2); for (let i = 0; i < 5; i++) { const a = i * 1.2566, lg = bx(-0.02, 0.02, 0.05, 0.09, 0, 0.3, mBlk, g); lg.rotation.y = a; lg.position.set(Math.sin(a) * 0.15, 0.07, Math.cos(a) * 0.15); cy(Math.sin(a) * 0.3, 0.03, Math.cos(a) * 0.3, 0.03, 0.04, mBlk, g, 'x'); }
+  // التوزيع: المكتب على الحيطة الشمالية جنب الباب (بين مفتاح النور والعمود) — التلفزيون على الحيطة الشرقية قصاد الضلع الطويل للكورنر وجنب الـ3 فيش — الشباك على جنب التلفزيون مش قصاده
+  { const r = E('office'), xe = r.x1, xw = r.x0, zN = r.z0;
+    const mPurp = new THREE.MeshBasicMaterial({ color: 0x9b5cff }), mPink = new THREE.MeshBasicMaterial({ color: 0xff4fa3 }), mNavy = S({ color: 0x26324a, roughness: 0.8 }), mGold = S({ color: 0xd9a93a, roughness: 0.35, metalness: 0.7 });
+    // ---- ديسك 120 على الحيطة الشمالية + شاشة + كيسة + كرسي جيمنج
+    const dx0 = xe - 1.60, dx1 = xe - 0.40, mx = (dx0 + dx1) / 2 - 0.1;
+    bx(dx0, dx1, 0.72, 0.75, zN, zN + 0.6, mBlk); for (const dx of [dx0 + 0.03, dx1 - 0.07]) { bx(dx, dx + 0.04, 0, 0.72, zN + 0.03, zN + 0.07, mBlk); bx(dx, dx + 0.04, 0, 0.72, zN + 0.53, zN + 0.57, mBlk); }
+    bx(dx0, dx1, 0.70, 0.71, zN + 0.01, zN + 0.02, mCyan); bx(mx - 0.31, mx + 0.31, 0.95, 1.31, zN + 0.12, zN + 0.15, mBlk); bx(mx - 0.295, mx + 0.295, 0.965, 1.295, zN + 0.15, zN + 0.153, mScr);
+    bx(mx - 0.03, mx + 0.03, 0.75, 0.95, zN + 0.1, zN + 0.2, mBlk); bx(mx - 0.12, mx + 0.12, 0.75, 0.765, zN + 0.05, zN + 0.25, mBlk);
+    bx(mx - 0.22, mx + 0.22, 0.75, 0.77, zN + 0.33, zN + 0.47, mBlk); bx(mx - 0.21, mx + 0.21, 0.77, 0.773, zN + 0.34, zN + 0.46, mCyan); bx(mx + 0.3, mx + 0.36, 0.75, 0.78, zN + 0.36, zN + 0.44, mBlk);
+    bx(dx1 - 0.3, dx1 - 0.09, 0.02, 0.48, zN + 0.08, zN + 0.52, mBlk); bx(dx1 - 0.304, dx1 - 0.3, 0.06, 0.44, zN + 0.11, zN + 0.49, mCyan);
+    hit(dx0, dx1, zN, zN + 0.6);
+    { const cx = mx, cz = zN + 1.05, g = G2(cx, cz, 0); for (let i = 0; i < 5; i++) { const a = i * 1.2566, lg = bx(-0.02, 0.02, 0.05, 0.09, 0, 0.3, mBlk, g); lg.rotation.y = a; lg.position.set(Math.sin(a) * 0.15, 0.07, Math.cos(a) * 0.15); cy(Math.sin(a) * 0.3, 0.03, Math.cos(a) * 0.3, 0.03, 0.04, mBlk, g, 'x'); }
       cy(0, 0.25, 0, 0.03, 0.34, mSteel2, g); bx(-0.25, 0.25, 0.42, 0.52, -0.25, 0.25, mBlk, g); bx(-0.24, 0.24, 0.52, 1.3, 0.19, 0.27, mBlk, g); bx(-0.07, 0.07, 0.55, 1.28, 0.185, 0.19, mRed, g); bx(-0.17, 0.17, 1.3, 1.42, 0.2, 0.26, mBlk, g);
-      for (const sx of [-1, 1]) { bx(sx * 0.27 - 0.03, sx * 0.27 + 0.03, 0.66, 0.69, -0.15, 0.15, mBlk, g); bx(sx * 0.27 - 0.015, sx * 0.27 + 0.015, 0.5, 0.66, 0.02, 0.06, mBlk, g); bx(sx * 0.24 - 0.02, sx * 0.24 + 0.02, 0.52, 1.25, 0.19, 0.27, mRed, g); } }
-    hit(xe - 1.3, xe - 0.8, (d0 + d1) / 2 - 0.25, (d0 + d1) / 2 + 0.25);
-    // أنتريه كورنر في الركن الجنوبي الغربي: ضلع على الحيطة الغربية ورا الكرسي (2.05م) + ضلع تحت الشباك قصاد التلفزيون (1.95م) + باف
-    const xw = r.x0, zS = r.z1, s0 = zS - 2.05, s1 = zS - 0.85, xS = xw + 1.95;
+      for (const sx of [-1, 1]) { bx(sx * 0.27 - 0.03, sx * 0.27 + 0.03, 0.66, 0.69, -0.15, 0.15, mBlk, g); bx(sx * 0.27 - 0.015, sx * 0.27 + 0.015, 0.5, 0.66, 0.02, 0.06, mBlk, g); bx(sx * 0.24 - 0.02, sx * 0.24 + 0.02, 0.52, 1.25, 0.19, 0.27, mRed, g); }
+      hit(cx - 0.25, cx + 0.25, cz - 0.25, cz + 0.25); }
+    // ---- رفّين فوق المكتب (الفوقاني قصير على يمين التكييف)
+    bx(dx0, dx1, 1.60, 1.635, zN, zN + 0.22, mWal); bx(dx0 + 0.02, dx1 - 0.02, 1.592, 1.60, zN + 0.205, zN + 0.215, mCyan);
+    [mRed, mNavy, mWht, mTerra, mBlk, mYel].forEach((m, i) => bx(dx0 + 0.06 + i * 0.034, dx0 + 0.09 + i * 0.034, 1.635, 1.635 + 0.19 + (i % 3) * 0.02, zN + 0.03, zN + 0.18, m));
+    for (const [fx, m] of [[dx0 + 0.45, mNavy], [dx0 + 0.62, mRed]]) { bx(fx - 0.03, fx + 0.03, 1.635, 1.72, zN + 0.07, zN + 0.13, m); bx(fx - 0.045, fx + 0.045, 1.72, 1.81, zN + 0.055, zN + 0.145, mCream); }
+    cy(dx0 + 0.85, 1.645, zN + 0.1, 0.04, 0.02, mBlk); cy(dx0 + 0.85, 1.69, zN + 0.1, 0.01, 0.07, mGold); cy(dx0 + 0.85, 1.76, zN + 0.1, 0.045, 0.08, mGold, W, 'y', 0.025);
+    cy(dx1 - 0.12, 1.675, zN + 0.1, 0.045, 0.08, mPot, W, 'y', 0.035); for (let i = 0; i < 6; i++) cushion(dx1 - 0.12 + Math.cos(i * 1.1) * 0.04, 1.74 + i * 0.016, zN + 0.1 + Math.sin(i * 1.1) * 0.04, 0.045, 0.012, 0.024, i % 2 ? mLeaf : mLeaf2);
+    { const a = dx1 - 0.62, b = dx1; bx(a, b, 2.02, 2.055, zN, zN + 0.22, mWal); bx(a + 0.02, b - 0.02, 2.012, 2.02, zN + 0.205, zN + 0.215, mCyan);
+      [mBlue, mRed, mBlk, mOlive, mBlue, mYel, mBlk, mRed].forEach((m, i) => bx(a + 0.05 + i * 0.019, a + 0.066 + i * 0.019, 2.055, 2.225, zN + 0.03, zN + 0.16, m));
+      bx(b - 0.3, b - 0.18, 2.055, 2.235, zN + 0.04, zN + 0.15, mBlk); cy(b - 0.24, 2.185, zN + 0.152, 0.03, 0.006, mSteel2, W, 'z'); cy(b - 0.24, 2.105, zN + 0.152, 0.022, 0.006, mSteel2, W, 'z'); bx(b - 0.14, b - 0.04, 2.055, 2.155, zN + 0.04, zN + 0.14, mPink); }
+    // ---- بانوه التلفزيون على الحيطة الشرقية (بين العمود وفيشتين الركن) + وحدة + بلايستيشن + إضاءة
+    { const tc = zN + 2.10, t0 = tc - 0.74, t1 = tc + 0.74;
+      bx(xe - 0.025, xe, 0, 2.05, t0, t1, mBlk); for (let i = 0; i < 5; i++) bx(xe - 0.05, xe - 0.025, 0, 2.05, t0 + i * 0.05, t0 + 0.03 + i * 0.05, mWal);
+      bx(xe - 0.36, xe, 0.22, 0.52, tc - 0.66, tc + 0.66, mBlk); bx(xe - 0.36, xe - 0.34, 0.21, 0.22, tc - 0.66, tc + 0.66, mCyan); tv(xe - 0.03, tc + 0.13, 1.11, 'W', 0.85);
+      bx(xe - 0.3, xe - 0.08, 0.52, 0.58, tc - 0.55, tc - 0.25, mWht); hit(xe - 0.36, xe, tc - 0.66, tc + 0.66);
+      bx(xe - 0.012, xe, 2.05, 2.07, t0 - 0.02, t1, mPurp); bx(xe - 0.012, xe, 0, 2.05, t0 - 0.02, t0, mPurp); }
+    // ---- أنتريه كورنر في الركن الجنوبي الغربي: الضلع الطويل (2.05م) على الحيطة الغربية قصاد التلفزيون + ضلع تحت الشباك (1.95م) + باف
+    const zS = r.z1, s0 = zS - 2.05, s1 = zS - 0.85, xS = xw + 1.95;
     bx(xw, xw + 0.85, 0.10, 0.40, s0, zS, mSofa2); bx(xw + 0.85, xS, 0.10, 0.40, s1, zS, mSofa2);
     bx(xw, xw + 0.22, 0.40, 0.82, s0, zS, mSofa2); bx(xw + 0.22, xS, 0.40, 0.82, zS - 0.22, zS, mSofa2);
     bx(xw + 0.22, xw + 0.85, 0.40, 0.60, s0, s0 + 0.16, mSofa2); bx(xS - 0.16, xS, 0.40, 0.60, s1, zS - 0.22, mSofa2);
@@ -1220,36 +1233,23 @@ const decor = new THREE.Group(); scene.add(decor);
     cushion(xw + 0.3, 0.64, s0 + 0.4, 0.07, 0.16, 0.19, mRed); cushion(xw + 0.34, 0.64, zS - 0.34, 0.13, 0.16, 0.13, mBlk); cushion(xS - 0.5, 0.64, zS - 0.3, 0.19, 0.16, 0.07, mRed);
     hit(xw, xw + 0.85, s0, zS); hit(xw + 0.85, xS, s1, zS);
     cy(xw + 1.35, 0.19, zS - 1.35, 0.22, 0.38, mTerra); hit(xw + 1.13, xw + 1.57, zS - 1.57, zS - 1.13);
-    // ---- ديكور الحيطان: رفّين فوق المكتب + هيكساجون LED فوق الكنبة + بوسترين + إضاءة RGB
-    { const mPurp = new THREE.MeshBasicMaterial({ color: 0x9b5cff }), mPink = new THREE.MeshBasicMaterial({ color: 0xff4fa3 }), mNavy = S({ color: 0x26324a, roughness: 0.8 }), mGold = S({ color: 0xd9a93a, roughness: 0.35, metalness: 0.7 });
-      for (const [y, a, b] of [[1.60, d0, d1], [2.02, d0 + 0.35, d1]]) { bx(xe - 0.22, xe, y, y + 0.035, a, b, mWal); bx(xe - 0.215, xe - 0.205, y - 0.008, y, a + 0.02, b - 0.02, mCyan); }
-      // الرف التحتاني: كتب + فيجرز + كاس + زرعة
-      [mRed, mNavy, mWht, mTerra, mBlk, mYel].forEach((m, i) => bx(xe - 0.18, xe - 0.03, 1.635, 1.635 + 0.19 + (i % 3) * 0.02, d0 + 0.06 + i * 0.034, d0 + 0.09 + i * 0.034, m));
-      for (const [fz, m] of [[d0 + 0.45, mNavy], [d0 + 0.62, mRed]]) { bx(xe - 0.13, xe - 0.07, 1.635, 1.72, fz - 0.03, fz + 0.03, m); bx(xe - 0.145, xe - 0.055, 1.72, 1.81, fz - 0.045, fz + 0.045, mCream); }
-      cy(xe - 0.1, 1.645, d0 + 0.85, 0.04, 0.02, mBlk); cy(xe - 0.1, 1.69, d0 + 0.85, 0.01, 0.07, mGold); cy(xe - 0.1, 1.76, d0 + 0.85, 0.045, 0.08, mGold, W, 'y', 0.025);
-      cy(xe - 0.1, 1.675, d1 - 0.12, 0.045, 0.08, mPot, W, 'y', 0.035); for (let i = 0; i < 6; i++) cushion(xe - 0.1 + Math.cos(i * 1.1) * 0.04, 1.74 + i * 0.016, d1 - 0.12 + Math.sin(i * 1.1) * 0.04, 0.045, 0.012, 0.024, i % 2 ? mLeaf : mLeaf2);
-      // الرف الفوقاني: علب ألعاب + سماعة + مكعب نور
-      [mBlue, mRed, mBlk, mOlive, mBlue, mYel, mBlk, mRed].forEach((m, i) => bx(xe - 0.16, xe - 0.03, 2.055, 2.225, d0 + 0.42 + i * 0.019, d0 + 0.436 + i * 0.019, m));
-      bx(xe - 0.15, xe - 0.04, 2.055, 2.235, d1 - 0.42, d1 - 0.30, mBlk); cy(xe - 0.152, 2.185, d1 - 0.36, 0.03, 0.006, mSteel2, W, 'x'); cy(xe - 0.152, 2.105, d1 - 0.36, 0.022, 0.006, mSteel2, W, 'x');
-      bx(xe - 0.14, xe - 0.04, 2.055, 2.155, d1 - 0.17, d1 - 0.07, mPink);
-      // هيكساجون LED على الحيطة الغربية فوق الكنبة
-      { const u = 0.15, zc = (s0 + s1) / 2, hx = [[0, 0, mCyan], [1.5, 0.866, mPurp], [3, 0, mPink], [4.5, 0.866, mCyan], [3, 1.732, mPurp], [-1.5, -0.866, mPink], [6, 0, mPurp], [0, 1.732, mCyan]];
-        for (const [dz, dy, m] of hx) { const h = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.02, 6), m); h.rotation.z = Math.PI / 2; h.position.set(xw + 0.012, 1.55 + dy * u, zc + (dz - 2.25) * u); W.add(h); }
-        const L = new THREE.PointLight(0x9b5cff, 0.55, 3.5, 1.8); L.position.set(xw + 0.5, 1.6, zc); W.add(L); }
-      // إضاءة ورا بانوه التلفزيون
-      bx(tx - 0.76, tx + 0.74, 2.05, 2.07, r.z0, r.z0 + 0.012, mPurp); bx(tx - 0.76, tx - 0.74, 0, 2.05, r.z0, r.z0 + 0.012, mPurp);
-      // بلاك أوت رول على الشباك (الشباك قصاد التلفزيون — من غيره هيعكس على الشاشة بالنهار)
-      { const a = WIN.office.a * K, b = WIN.office.b * K; bx(a - 0.06, b + 0.06, 2.07, 2.15, r.z1 - 0.07, r.z1, mBlk); bx(a - 0.04, b + 0.04, 1.72, 2.08, r.z1 - 0.035, r.z1 - 0.03, S({ color: 0x3a3d42, roughness: 1 })); bx(a - 0.04, b + 0.04, 1.70, 1.72, r.z1 - 0.04, r.z1 - 0.025, mBlk); }
-      // بوسترين على حيطة الشباك + عمود نور RGB في الركن
-      for (const [a, col, c2] of [[xw + 0.32, mNavy, mYel], [xw + 0.82, mTerra, mCream]]) { bx(a, a + 0.42, 1.22, 1.80, r.z1 - 0.02, r.z1, mBlk); bx(a + 0.025, a + 0.395, 1.245, 1.775, r.z1 - 0.024, r.z1 - 0.02, col); cy(a + 0.21, 1.56, r.z1 - 0.026, 0.09, 0.004, c2, W, 'z'); bx(a + 0.09, a + 0.33, 1.30, 1.34, r.z1 - 0.027, r.z1 - 0.024, c2); }
-      cy(xw + 0.12, 0.015, s0 - 0.18, 0.09, 0.03, mBlk); cy(xw + 0.12, 0.8, s0 - 0.18, 0.018, 1.55, mPurp); }
-    bx(xw + 0.92, xe - 1.4, 0.002, 0.013, r.z0 + 0.8, r.z1 - 0.9, mRug); plant(xe - 0.35, r.z1 - 0.4, 1.2);
+    // ---- هيكساجون LED فوق الكنبة + بلاك أوت للشباك + بوسترين + عمود نور RGB
+    { const u = 0.15, zc = (s0 + s1) / 2, hx = [[0, 0, mCyan], [1.5, 0.866, mPurp], [3, 0, mPink], [4.5, 0.866, mCyan], [3, 1.732, mPurp], [-1.5, -0.866, mPink], [6, 0, mPurp], [0, 1.732, mCyan]];
+      for (const [dz, dy, m] of hx) { const h = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.02, 6), m); h.rotation.z = Math.PI / 2; h.position.set(xw + 0.012, 1.55 + dy * u, zc + (dz - 2.25) * u); W.add(h); }
+      const L = new THREE.PointLight(0x9b5cff, 0.55, 3.5, 1.8); L.position.set(xw + 0.5, 1.6, zc); W.add(L); }
+    { const a = WIN.office.a * K, b = WIN.office.b * K; bx(a - 0.06, b + 0.06, 2.07, 2.15, r.z1 - 0.07, r.z1, mBlk); bx(a - 0.04, b + 0.04, 1.72, 2.08, r.z1 - 0.035, r.z1 - 0.03, S({ color: 0x3a3d42, roughness: 1 })); bx(a - 0.04, b + 0.04, 1.70, 1.72, r.z1 - 0.04, r.z1 - 0.025, mBlk); }
+    for (const [a, col, c2] of [[xw + 0.32, mNavy, mYel], [xw + 0.82, mTerra, mCream]]) { bx(a, a + 0.42, 1.22, 1.80, r.z1 - 0.02, r.z1, mBlk); bx(a + 0.025, a + 0.395, 1.245, 1.775, r.z1 - 0.024, r.z1 - 0.02, col); cy(a + 0.21, 1.56, r.z1 - 0.026, 0.09, 0.004, c2, W, 'z'); bx(a + 0.09, a + 0.33, 1.30, 1.34, r.z1 - 0.027, r.z1 - 0.024, c2); }
+    cy(xw + 0.12, 0.015, s0 - 0.18, 0.09, 0.03, mBlk); cy(xw + 0.12, 0.8, s0 - 0.18, 0.018, 1.55, mPurp);
+    bx(xw + 0.92, xe - 0.5, 0.002, 0.013, zN + 1.5, zS - 0.9, mRug); plant(xe - 0.35, zS - 0.4, 1.2);
   }
   // =================== أوضة الأطفال ===================
-  // التوزيع: الدولاب على حيطة الباب وقدامه فاضي عشان الضلف تفتح — السرير الدورين على الحيطة الشرقية ناحية الشباك بعيد عن الدولاب وعن فتحة الباب — المكتب تحت الشباك
+  // التوزيع: الدولاب في الركن على الحيطة الغربية (مش تحت التكييف) وقدامه فاضي — السرير الدورين على الحيطة الشرقية ناحية الشباك بعيد عن الدولاب وعن فتحة الباب — المكتب تحت الشباك
   { const r = E('bed');
-    bx(r.x0 + 0.38, r.x0 + 1.38, 0.06, 2.0, r.z0, r.z0 + 0.55, mWht); bx(r.x0 + 0.42, r.x0 + 1.34, 0, 0.06, r.z0 + 0.04, r.z0 + 0.5, mBlk); bx(r.x0 + 0.876, r.x0 + 0.884, 0.08, 1.98, r.z0 + 0.55, r.z0 + 0.553, mBlk);
-    for (const dx of [0.82, 0.92]) bx(r.x0 + dx, r.x0 + dx + 0.015, 0.9, 1.2, r.z0 + 0.55, r.z0 + 0.57, mWal); hit(r.x0 + 0.38, r.x0 + 1.38, r.z0, r.z0 + 0.55);
+    { const w0 = r.z0 + 0.14, w1 = w0 + 0.95, wm = (w0 + w1) / 2;        // الدولاب في الركن على الحيطة الغربية: بعد البروز وقبل الفيشتين، وضلفه بتفتح على فراغ
+      bx(r.x0, r.x0 + 0.55, 0.06, 2.0, w0, w1, mWht); bx(r.x0 + 0.04, r.x0 + 0.5, 0, 0.06, w0 + 0.04, w1 - 0.04, mBlk); bx(r.x0 + 0.55, r.x0 + 0.553, 0.08, 1.98, wm - 0.004, wm + 0.004, mBlk);
+      for (const dz of [-0.06, 0.045]) bx(r.x0 + 0.55, r.x0 + 0.57, 0.9, 1.2, wm + dz, wm + dz + 0.015, mWal); hit(r.x0, r.x0 + 0.55, w0, w1);
+      // وحدة تخزين واطية بسلال ملونة على الحيطة الشمالية تحت الخريطة والتكييف
+      const c0 = r.x0 + 0.78, c1 = c0 + 0.9; bx(c0, c1, 0, 0.75, r.z0, r.z0 + 0.32, mWht); [mBlue, mYel, mRed, mOlive, mTerra, mBlue].forEach((m, i) => bx(c0 + 0.03 + (i % 3) * 0.29, c0 + 0.29 + (i % 3) * 0.29, 0.05 + (i > 2 ? 0.36 : 0), 0.36 + (i > 2 ? 0.36 : 0), r.z0 + 0.32, r.z0 + 0.33, m)); hit(c0, c1, r.z0, r.z0 + 0.32); }
     const bw = 0.98, x0 = r.x1 - bw, b1 = r.z1 - 0.06, b0 = b1 - 2.0;
     for (const [a, b] of [[x0, b0], [r.x1 - 0.06, b0], [x0, b1 - 0.06], [r.x1 - 0.06, b1 - 0.06]]) bx(a, a + 0.06, 0, 1.78, b, b + 0.06, mWal);
     for (const [yb, col] of [[0.25, mBlue], [1.22, mYel]]) { bx(x0, r.x1, yb, yb + 0.08, b0, b1, mWal); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.08, yb + 0.22, b0 + 0.06, b1 - 0.06, mWht); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.22, yb + 0.27, b0 + 0.6, b1 - 0.06, col); cushion(x0 + bw / 2, yb + 0.29, b0 + 0.3, 0.3, 0.06, 0.17, mWht); }
@@ -1261,8 +1261,8 @@ const decor = new THREE.Group(); scene.add(decor);
     chair(dx0 + 0.35, r.z1 - 0.72, Math.PI, mBlue); cy(dx0 + 0.15, 0.76, r.z1 - 0.15, 0.06, 0.02, mBlk); cy(dx0 + 0.15, 0.84, r.z1 - 0.15, 0.008, 0.16, mBlk); cy(dx0 + 0.15, 0.945, r.z1 - 0.2, 0.07, 0.07, mYel, W, 'y', 0.04);
     hit(dx0, dx1, r.z1 - 0.5, r.z1);
     cy(r.x0 + 1.5, 0.008, r.z0 + 2.0, 0.7, 0.014, mBlue); cy(r.x0 + 1.5, 0.012, r.z0 + 2.0, 0.5, 0.014, mCream);
-    bx(r.x0, r.x0 + 0.42, 0, 0.4, r.z0 + 1.75, r.z0 + 2.35, mYel); bx(r.x0, r.x0 + 0.43, 0.4, 0.44, r.z0 + 1.74, r.z0 + 2.36, mWal); hit(r.x0, r.x0 + 0.43, r.z0 + 1.75, r.z0 + 2.35);
-    bx(r.x0, r.x0 + 0.2, 1.35, 1.38, r.z0 + 1.55, r.z0 + 2.55, mWal); for (let i = 0; i < 7; i++) bx(r.x0 + 0.03, r.x0 + 0.17, 1.38, 1.56 + (i % 3) * 0.03, r.z0 + 1.61 + i * 0.07, r.z0 + 1.66 + i * 0.07, [mBlue, mYel, mRed, mOlive][i % 4]);
+    bx(r.x0, r.x0 + 0.42, 0, 0.4, r.z0 + 2.2, r.z0 + 2.8, mYel); bx(r.x0, r.x0 + 0.43, 0.4, 0.44, r.z0 + 2.19, r.z0 + 2.81, mWal); hit(r.x0, r.x0 + 0.43, r.z0 + 2.2, r.z0 + 2.8);
+    bx(r.x0, r.x0 + 0.2, 1.35, 1.38, r.z0 + 2.0, r.z0 + 3.0, mWal); for (let i = 0; i < 7; i++) bx(r.x0 + 0.03, r.x0 + 0.17, 1.38, 1.56 + (i % 3) * 0.03, r.z0 + 2.06 + i * 0.07, r.z0 + 2.11 + i * 0.07, [mBlue, mYel, mRed, mOlive][i % 4]);
   }
   // =================== المطبخ ===================
   // التوزيع: الحوض في مكانه — البوتاجاز والشفاط في نص الحيطة البعيدة — الغسالة تحت الرخامة جنب الحوض (مية وصرف) — وحدة تخزين وبعدها التلاجة على الحيطة الشرقية جنب فيشها
@@ -1317,18 +1317,18 @@ const decor = new THREE.Group(); scene.add(decor);
     // ---------- أوضة الأطفال ----------
     { const r = E('bed'), xw = r.x0;
       // سلة باسكت على الحيطة الغربية + كورة
-      { const zc = r.z0 + 0.9; bx(xw, xw + 0.02, 1.75, 2.12, zc - 0.26, zc + 0.26, mWht); bx(xw + 0.02, xw + 0.023, 1.80, 1.98, zc - 0.11, zc - 0.095, mRed); bx(xw + 0.02, xw + 0.023, 1.80, 1.98, zc + 0.095, zc + 0.11, mRed); bx(xw + 0.02, xw + 0.023, 1.965, 1.98, zc - 0.11, zc + 0.11, mRed);
+      { const zc = r.z0 + 1.52; bx(xw, xw + 0.02, 1.75, 2.12, zc - 0.26, zc + 0.26, mWht); bx(xw + 0.02, xw + 0.023, 1.80, 1.98, zc - 0.11, zc - 0.095, mRed); bx(xw + 0.02, xw + 0.023, 1.80, 1.98, zc + 0.095, zc + 0.11, mRed); bx(xw + 0.02, xw + 0.023, 1.965, 1.98, zc - 0.11, zc + 0.11, mRed);
         const ring = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.011, 8, 22), mOrange); ring.rotation.x = Math.PI / 2; ring.position.set(xw + 0.15, 1.80, zc); W.add(ring);
         const net = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.07, 0.15, 10, 2, true), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })); net.position.set(xw + 0.15, 1.72, zc); W.add(net);
         ball(xw + 0.55, 0.115, zc + 0.15, 0.115, mOrange); }
       // حبل أعلام ملونة على الحيطة الغربية
-      { const za = r.z0 + 1.55, zb = r.z1 - 0.3, n = 13, cols = [mRed, mYel, mBlue, mOlive, mTerra]; bx(xw + 0.004, xw + 0.008, 2.232, 2.238, za, zb, mBlk);
+      { const za = r.z0 + 2.0, zb = r.z1 - 0.3, n = 11, cols = [mRed, mYel, mBlue, mOlive, mTerra]; bx(xw + 0.004, xw + 0.008, 2.232, 2.238, za, zb, mBlk);
         for (let i = 0; i < n; i++) { const f = new THREE.Mesh(new THREE.CircleGeometry(0.085, 3), cols[i % 5]); f.rotation.set(0, Math.PI / 2, -Math.PI / 2); f.position.set(xw + 0.012, 2.19, za + 0.1 + i * (zb - za - 0.2) / (n - 1)); W.add(f); } }
-      // خريطة العالم على الحيطة الغربية ناحية الشباك
-      { const a = r.z1 - 1.2, b = r.z1 - 0.35; bx(xw, xw + 0.02, 1.15, 1.72, a, b, mWht); bx(xw + 0.02, xw + 0.024, 1.18, 1.69, a + 0.03, b - 0.03, mBlue);
-        for (const [dy, dz, sy, sz] of [[1.52, 0.2, 0.09, 0.08], [1.36, 0.25, 0.07, 0.045], [1.5, 0.45, 0.06, 0.07], [1.36, 0.47, 0.08, 0.05], [1.52, 0.64, 0.08, 0.1], [1.3, 0.7, 0.035, 0.05]]) cushion(xw + 0.025, dy, a + dz, 0.003, sy, sz, mLeaf2); }
+      // خريطة العالم على الحيطة الشمالية (فوق وحدة التخزين وتحت التكييف)
+      { const a = r.x0 + 0.8, b = a + 0.85, z = r.z0; bx(a, b, 1.15, 1.72, z, z + 0.02, mWht); bx(a + 0.03, b - 0.03, 1.18, 1.69, z + 0.02, z + 0.024, mBlue);
+        for (const [dy, dx, sy, sx] of [[1.52, 0.2, 0.09, 0.08], [1.36, 0.25, 0.07, 0.045], [1.5, 0.45, 0.06, 0.07], [1.36, 0.47, 0.08, 0.05], [1.52, 0.64, 0.08, 0.1], [1.3, 0.7, 0.035, 0.05]]) cushion(a + dx, dy, z + 0.025, sx, sy, 0.003, mLeaf2); }
       // مكعبات على الأرض + دبدوب على السرير التحتاني
-      { const z = r.z0 + 2.62; for (const [dx, dz, y, m] of [[0.5, 0, 0, mRed], [0.62, 0.02, 0, mBlue], [0.56, 0.01, 0.1, mYel], [0.8, 0.2, 0, mOlive]]) bx(xw + dx, xw + dx + 0.1, y, y + 0.1, z + dz, z + dz + 0.1, m); }
+      { const z = r.z0 + 1.75; for (const [dx, dz, y, m] of [[0.5, 0, 0, mRed], [0.62, 0.02, 0, mBlue], [0.56, 0.01, 0.1, mYel], [0.8, 0.2, 0, mOlive]]) bx(xw + dx, xw + dx + 0.1, y, y + 0.1, z + dz, z + dz + 0.1, m); }
       { const tx = r.x1 - 0.49, tz = r.z1 - 1.44, y = 0.52; ball(tx, y + 0.1, tz, 0.095, mBrown); ball(tx, y + 0.24, tz, 0.07, mBrown); for (const s of [-1, 1]) { ball(tx + s * 0.055, y + 0.3, tz, 0.026, mBrown); ball(tx + s * 0.1, y + 0.12, tz - 0.03, 0.035, mBrown); ball(tx + s * 0.06, y + 0.03, tz - 0.08, 0.04, mBrown); } ball(tx, y + 0.225, tz - 0.06, 0.028, mCream); }
       // لابتوب وكتب على المكتب
       { const dx0 = r.x0 + 0.76, dx1 = dx0 + 1.0; bx(dx0 + 0.42, dx0 + 0.72, 0.75, 0.765, r.z1 - 0.40, r.z1 - 0.20, mSteel2); bx(dx0 + 0.42, dx0 + 0.72, 0.765, 0.96, r.z1 - 0.20, r.z1 - 0.19, mSteel2); bx(dx0 + 0.435, dx0 + 0.705, 0.78, 0.945, r.z1 - 0.203, r.z1 - 0.20, mScr);
@@ -1388,6 +1388,32 @@ const decor = new THREE.Group(); scene.add(decor);
       bx(sx0 + 1.5, sx0 + 1.92, 0.50, 0.525, sz1 - 0.88, sz1 - 0.3, mOlive); bx(sx0 + 1.5, sx0 + 1.92, 0.2, 0.52, sz1 - 0.915, sz1 - 0.9, mOlive);
       bx(D.entrance.a * K + 0.18, D.entrance.b * K - 0.18, 0.002, 0.014, r.z0 + 0.12, r.z0 + 0.6, mJute);
     }
+    // ---------- تكييفات على نقط التكييف (العلب العالية) ----------
+    { const mSl = S({ color: 0x5a5d61, roughness: 0.8 });
+      const acN = (xc, y, z) => { bx(xc - 0.4, xc + 0.4, y, y + 0.28, z, z + 0.2, mWht); bx(xc - 0.37, xc + 0.37, y + 0.012, y + 0.04, z + 0.2, z + 0.203, mSl); bx(xc + 0.28, xc + 0.36, y + 0.2, y + 0.23, z + 0.2, z + 0.202, mSl); };
+      acN(5.05 * K, 2.24, E('bed').z0); acN(8.75 * K, 2.20, E('office').z0);
+      { const x = E('master').x1, zc = 5.45, y = 2.12; bx(x - 0.2, x, y, y + 0.28, zc - 0.4, zc + 0.4, mWht); bx(x - 0.203, x - 0.2, y + 0.012, y + 0.04, zc - 0.37, zc + 0.37, mSl); bx(x - 0.202, x - 0.2, y + 0.2, y + 0.23, zc + 0.28, zc + 0.36, mSl); } }
+    // ---------- أباجورات سقف حوالين اللمبات ----------
+    { const shade = (x, z, rad, col, op) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad * 1.12, 0.2, 24, 1, true), S({ color: col, roughness: 1, transparent: op < 1, opacity: op, side: THREE.DoubleSide })); m.position.set(x * K, H - 0.13, z * K); W.add(m); cy(x * K, H - 0.015, z * K, rad * 0.5, 0.03, mWht); };
+      shade(12.3, 2.40, 0.24, 0xefe6d2, 0.85); shade(13.0, 4.70, 0.24, 0xefe6d2, 0.85); shade(5.6, 3.70, 0.17, 0xefe6d2, 0.85); shade(8.6, 3.70, 0.17, 0xefe6d2, 0.85); shade(8.48, 1.54, 0.2, 0xffffff, 0.85);
+      shade(5.47, 5.35, 0.2, 0xf0c95a, 0.9); shade(5.47, 6.75, 0.2, 0x6fa0d8, 0.9); shade(8.65, 5.35, 0.2, 0x1c1c1e, 1); shade(8.65, 6.75, 0.2, 0x1c1c1e, 1); }
+    // ---------- الماستر: كتاب وكوباية وموبايل على الكوميدينو + شبشب ----------
+    { const r = E('master'), xe = r.x1, bc = (4.63 * K + 6.60 * K) / 2, b0 = bc - 0.90, b1 = bc + 0.90, nS = b1 + 0.06, nN = b0 - 0.56;
+      bx(xe - 0.32, xe - 0.12, 0.55, 0.58, nS + 0.12, nS + 0.27, mOlive); bx(xe - 0.31, xe - 0.13, 0.58, 0.60, nS + 0.13, nS + 0.26, mCream); cy(xe - 0.2, 0.60, nS + 0.38, 0.03, 0.1, S({ color: 0xdfe8ec, roughness: 0.1, transparent: true, opacity: 0.5 }));
+      bx(xe - 0.36, xe - 0.29, 0.55, 0.558, nN + 0.3, nN + 0.44, mBlk);
+      for (const dz of [0.36, 0.22]) { bx(xe - 1.15, xe - 0.9, 0, 0.035, b0 - dz, b0 - dz + 0.1, mCream); bx(xe - 1.02, xe - 0.9, 0.035, 0.075, b0 - dz, b0 - dz + 0.1, mCream); } }
+    // ---------- بلكونة المطبخ: حبال غسيل + هدوم + جردل ومقشة ----------
+    { const r = E('serv');
+      for (const dz of [0.22, 0.38, 0.54]) cy((r.x0 + r.x1) / 2, 2.0, r.z0 + dz, 0.004, r.x1 - r.x0 - 0.2, mWht, W, 'x');
+      bx(r.x0 + 0.3, r.x0 + 0.7, 1.55, 2.0, r.z0 + 0.215, r.z0 + 0.225, mBlue); bx(r.x0 + 0.78, r.x0 + 1.02, 1.68, 2.0, r.z0 + 0.375, r.z0 + 0.385, mCream); bx(r.x0 + 0.45, r.x0 + 0.62, 1.6, 2.0, r.z0 + 0.535, r.z0 + 0.545, mRed);
+      cy(r.x0 + 0.2, 0.13, r.z0 + 0.2, 0.13, 0.26, mBlue, W, 'y', 0.1); { const mp = cy(r.x0 + 0.1, 0.7, r.z0 + 0.42, 0.012, 1.4, mWal); mp.rotation.z = 0.06; cy(r.x0 + 0.14, 0.03, r.z0 + 0.42, 0.07, 0.06, mCream); } }
+    // ---------- بسطة السلم: دواسة + زرعة جنب باب الشقة ----------
+    { const a = D.entrance.a * K, b = D.entrance.b * K; bx(a + 0.15, b - 0.15, 0.002, 0.014, -0.78, -0.3, mBrown); plant(a - 0.32, -0.5, 1.0); }
+    // ---------- السفرة والترابيزة والجزامة: إكسسوارات ----------
+    { const r = E('rec'), tx = r.x0 + 1.75, tz = r.z0 + 1.75, cx = r.x0 + 2.25 + 1.75, cz = r.z1 - 3.15 + 0.95;
+      bx(tx - 0.8, tx + 0.8, 0.75, 0.753, tz - 0.14, tz + 0.14, mCream); for (const dx of [-0.5, 0, 0.5]) for (const s of [-1, 1]) { cy(tx + dx, 0.757, tz + s * 0.3, 0.11, 0.008, mWht); cy(tx + dx, 0.763, tz + s * 0.3, 0.075, 0.006, mStone); }
+      bx(cx - 0.3, cx - 0.04, 0.39, 0.40, cz - 0.13, cz + 0.13, mBlk); bx(cx - 0.27, cx - 0.09, 0.40, 0.425, cz - 0.1, cz + 0.04, mOlive); bx(cx - 0.05, cx + 0.0, 0.39, 0.405, cz + 0.2, cz + 0.36, mBlk);
+      cy(r.x1 - 2.78, 1.035, r.z0 + 0.12, 0.07, 0.03, mBlk, W, 'y', 0.045); }
     // ---------- الحمام ----------
     { const r = E('bath'), sx = 4.95 * K, tx = 4.25 * K, zN = r.z0;
       cy(tx - 0.34, 0.03, zN + 0.12, 0.055, 0.06, mWht); cy(tx - 0.34, 0.22, zN + 0.12, 0.012, 0.38, mWht);
