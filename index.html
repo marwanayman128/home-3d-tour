@@ -1155,8 +1155,9 @@ const decor = new THREE.Group(); scene.add(decor);
   { const pm = (c, b = 0.9) => S({ color: c, roughness: 0.95, bumpMap: T_plaster, bumpScale: b }), mGg = pm(0xb3a899), mGy = pm(0x8b8883), mBkW = pm(0x232325, 0.6);
     const F = (dir, c, s0, s1, mat, ops = [], top = H) => face(dir, c, s0, s1, ops, mat, 1, 1, top);
     faceParent = decor;
-    // الريسبشن: حيطة التلفزيون (شرق) جراي — حيطة السفرة والبوفيه (غرب) جريج — حيطة المدخل وحيطة البلكونة أبيض
-    { const r = R.rec; F('W', r.x1, r.z0, r.z1, mGy); F('E', r.x0, r.z0, r.z1, mGg, [{ a: D.mouth.a, b: D.mouth.b, y0: 0, y1: 2.25 }]); }
+    // الريسبشن: حيطة التلفزيون (شرق) جراي + أسود يفصلهم شرايح الجوز — حيطة السفرة والبوفيه (غرب) جريج — حيطة المدخل وحيطة البلكونة أبيض
+    { const r = R.rec, zB = (r.z1 * K - 2.65) / K;                          // zB = نهاية فاصل الشرايح الخشب: شماله جراي ويمينه أسود لآخر الحيطة
+      F('W', r.x1, r.z0, zB, mGy); F('W', r.x1, zB, r.z1, mBkW); F('E', r.x0, r.z0, r.z1, mGg, [{ a: D.mouth.a, b: D.mouth.b, y0: 0, y1: 2.25 }]); }
     // الطرقة: أبيض — وبلوك جريج ورا الكونسول والمراية (من أول الطرقة لحد باب الأطفال)
     F('N', 4.20, 3.95, D.bed.a - 0.08, mGg); F('E', 3.95, 3.20, 4.20, mGg, [dop(D.master)]);
     // أوضة الأطفال: حيطة السرير (شرق) جراي — حيطة الخريطة والتخزين (شمال) جريج — حيطة الشباك والحيطة الغربية أبيض
@@ -1193,8 +1194,13 @@ const decor = new THREE.Group(); scene.add(decor);
     cushion(sx0 + 0.33, 0.66, sz0 + 0.5, 0.07, 0.17, 0.2, mOlive); cushion(sx0 + 0.33, 0.66, sz0 + 1.5, 0.07, 0.17, 0.2, mTerra); cushion(sx0 + 0.6, 0.66, sz1 - 0.15, 0.2, 0.17, 0.07, mOlive); cushion(sx0 + 1.6, 0.66, sz1 - 0.15, 0.2, 0.17, 0.07, mCream);
     hit(sx0, sx0 + 0.95, sz0, sz1 + 0.2); hit(sx0 + 0.95, sx0 + 2.05, sz1 - 0.9, sz1 + 0.2);
     const tvz = (sz0 + sz1) / 2 - 0.25;
-    bx(r.x1 - 0.42, r.x1, 0.25, 0.58, tvz - 1.05, tvz + 1.05, mWal); bx(r.x1 - 0.424, r.x1 - 0.42, 0.41, 0.42, tvz - 1.0, tvz + 1.0, mBlk); bx(r.x1 - 0.03, r.x1, 0.58, 2.2, tvz - 0.60, tvz + 1.05, mBlk); bx(r.x1 - 0.03, r.x1, 0, H, tvz - 1.05, tvz - 0.60, mBlk);
-    for (let i = 0; i < 9; i++) bx(r.x1 - 0.06, r.x1 - 0.03, 0, H, tvz - 1.04 + i * 0.05, tvz - 1.01 + i * 0.05, mWal); tv(r.x1 - 0.05, tvz + 0.22, 1.44, 'W', 1.0);   // الشرايح شمال التلفزيون ومن الأرض للسقف
+    bx(r.x1 - 0.42, r.x1, 0.25, 0.58, tvz - 1.05, tvz + 1.05, mWal); bx(r.x1 - 0.424, r.x1 - 0.42, 0.41, 0.42, tvz - 1.0, tvz + 1.0, mBlk); bx(r.x1 - 0.03, r.x1, 0, H, tvz - 1.05, tvz - 0.60, mBlk);
+    for (let i = 0; i < 9; i++) bx(r.x1 - 0.06, r.x1 - 0.03, 0, H, tvz - 1.04 + i * 0.05, tvz - 1.01 + i * 0.05, mWal); tv(r.x1 - 0.02, tvz + 0.22, 1.44, 'W', 1.0);   // الشرايح فاصل من الأرض للسقف — يمينها الحيطة سودا كاملة
+    { const mLed = new THREE.MeshBasicMaterial({ color: 0xffe2a8 }), a = tvz + 1.15, b = tvz + 1.8;   // رفّين جوز على الجزء الأسود يمين التلفزيون
+      for (const y of [1.45, 1.85]) { bx(r.x1 - 0.22, r.x1, y, y + 0.035, a, b, mWal); bx(r.x1 - 0.215, r.x1 - 0.205, y - 0.008, y, a + 0.02, b - 0.02, mLed); }
+      cy(r.x1 - 0.1, 1.535, a + 0.13, 0.045, 0.1, mPot, W, 'y', 0.035); for (let i = 0; i < 6; i++) cushion(r.x1 - 0.1 + Math.cos(i * 1.1) * 0.04, 1.6 + i * 0.016, a + 0.13 + Math.sin(i * 1.1) * 0.04, 0.045, 0.012, 0.024, i % 2 ? mLeaf : mLeaf2);
+      [mOlive, mCream, mTerra].forEach((m, i) => bx(r.x1 - 0.19, r.x1 - 0.03, 1.485 + i * 0.028, 1.513 + i * 0.028, a + 0.33, a + 0.56, m));
+      cy(r.x1 - 0.1, 1.975, b - 0.15, 0.04, 0.18, mTerra, W, 'y', 0.06); bx(r.x1 - 0.035, r.x1 - 0.02, 1.885, 2.12, a + 0.08, a + 0.26, mWal); bx(r.x1 - 0.038, r.x1 - 0.035, 1.9, 2.105, a + 0.095, a + 0.245, mCream); }
     hit(r.x1 - 0.42, r.x1, tvz - 1.05, tvz + 1.05);
     { const cx = sx0 + 1.75, cz = sz0 + 0.95; cy(cx, 0.37, cz, 0.42, 0.04, mWal); for (let i = 0; i < 3; i++) cy(cx + Math.cos(i * 2.1) * 0.28, 0.175, cz + Math.sin(i * 2.1) * 0.28, 0.015, 0.35, mBlk); cy(cx + 0.1, 0.43, cz, 0.05, 0.08, mPot); hit(cx - 0.4, cx + 0.4, cz - 0.4, cz + 0.4); }
     bx(sx0 + 0.6, r.x1 - 0.7, 0.002, 0.014, sz0 - 0.1, sz1 - 0.2, mJute);
