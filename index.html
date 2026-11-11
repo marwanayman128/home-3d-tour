@@ -80,6 +80,7 @@
 <div id="err"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
@@ -1110,7 +1111,7 @@ const decor = new THREE.Group(); scene.add(decor);
   }
   // ---- النجفتين النازلين على الكوميدينو (اللي جنب الباب)
   { const nz = b0 - 0.56, px = xe - 0.24;
-    for (const [pz, yb, big] of [[nz + 0.16, 1.18, 0], [nz + 0.36, 1.42, 1]]) {
+    for (const [pz, yb, big] of [[nz + 0.25, 1.30, 1], [b1 + 0.06 + 0.25, 1.30, 1]]) {
       db(px - 0.003, px + 0.003, yb + 0.1, GH, pz - 0.003, pz + 0.003, mBlk);
       const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.02, 14), mBlk); cap.position.set(px / K, GH - 0.01, pz / K); decor.add(cap);
       const sh = new THREE.Mesh(new THREE.CylinderGeometry(big ? 0.07 : 0.028, big ? 0.07 : 0.028, big ? 0.12 : 0.30, 16), mBlk); sh.position.set(px / K, yb + (big ? 0.06 : 0.15), pz / K); decor.add(sh);
@@ -2088,11 +2089,28 @@ function hud(dt) {
    ===================================================================== */
 let shDirty = 4;
 decorSet(true);
+// ---- مرايات بتعكس فعلاً (على الكمبيوتر بس — على الموبايل بتفضل رمادي عشان الأداء). كل مراية بتشتغل وانت في أوضتها بس.
+const MIRS = []; let selfAv = null, selfPX = 0, selfPZ = 0;
+if (!(('ontouchstart' in window) || navigator.maxTouchPoints > 0)) import('three/addons/objects/Reflector.js').then(({ Reflector }) => {
+  const tw = Math.max(256, (innerWidth * 0.6) | 0), th = Math.max(256, (innerHeight * 0.6) | 0);
+  const add = (geo, x, y, z, ry, room) => { const m = new Reflector(geo, { clipBias: 0.003, textureWidth: tw, textureHeight: th, color: 0xc9cfd2 }); m.position.set(x, y, z); m.rotation.y = ry; m.userData.nh = true; m.visible = false; if (m.camera) m.camera.layers.enable(1); scene.add(m); MIRS.push({ obj: m, room }); };
+  add(new THREE.PlaneGeometry(0.60, 1.80), R.rec.x1 - 0.029, 1.06, R.rec.z0 + 2.72, -Math.PI / 2, 'rec');          // مراية الريسبشن بالطول
+  add(new THREE.PlaneGeometry(0.60, 0.41), 4.68 * K, 1.625, R.bath.z0 + 0.027, 0, 'bath');                           // مراية حوض الحمام
+  add(new THREE.CircleGeometry(0.35, 40), R.master.x0 + 1.55, 1.42, R.master.z0 + 0.031, 0, 'master');              // مراية التسريحة
+  add(new THREE.CircleGeometry(0.26, 40), R.corr.x0 + 1.2, 1.52, R.corr.z1 - 0.031, Math.PI, 'corr');               // مراية الطرقة
+}).catch(() => {});
+function selfTick(dt) {   // شخصيتك بتظهر في المرايات بس (layer 1) — الكاميرا الأساسية مش بتشوفها
+  if (!MIRS.length) return;
+  let any = false; for (const m of MIRS) { const r = R[m.room]; m.obj.visible = decor.visible && pl.x > r.x0 - 0.4 && pl.x < r.x1 + 0.4 && pl.z > r.z0 - 0.4 && pl.z < r.z1 + 0.4; any = any || m.obj.visible; }
+  if (!selfAv) { if (!ME.name) return; selfAv = makeAvatar(ME.name, ME.g); selfAv.userData.lab.visible = false; selfAv.traverse(o => { o.layers.set(1); o.userData.nh = true; }); scene.add(selfAv); selfPX = pl.x; selfPZ = pl.z; }
+  selfAv.visible = any; if (!any) return;
+  selfAv.position.set(pl.x, 0, pl.z); selfAv.rotation.y = pl.yaw; animAvatar(selfAv, pl.x - selfPX, pl.z - selfPZ, pl.yaw, dt, pl.pitch); selfPX = pl.x; selfPZ = pl.z;
+}
 scene.traverse(o => { if (!o.isMesh) return; const m = o.material, soft = !Array.isArray(m) && (m.transparent || m.isMeshBasicMaterial); o.castShadow = !soft && !o.userData.nc; o.receiveShadow = !soft; });
 const clock = new THREE.Clock();
 function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
-  step(dt); netTick(dt); penTick(); hud(dt);
+  step(dt); netTick(dt); selfTick(dt); penTick(); hud(dt);
   if (shDirty > 0) { renderer.shadowMap.needsUpdate = true; shDirty--; }
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
