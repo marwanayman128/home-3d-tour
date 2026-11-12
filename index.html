@@ -1288,7 +1288,7 @@ const decor = new THREE.Group(); scene.add(decor);
       const snake = (x, y, z, h, q = 1) => { cy(x, y + 0.07 * q, z, 0.075 * q, 0.14 * q, mPot, W, 'y', 0.06 * q); for (let i = 0; i < 8; i++) { const an = i * 0.85, hh = h * (0.6 + rnd() * 0.4), m = new THREE.Mesh(new THREE.ConeGeometry(0.026 * q, hh, 4), i % 2 ? mLeaf : mLeaf2); m.scale.z = 0.35; m.position.set(x + Math.cos(an) * 0.035 * q, y + 0.14 * q + hh / 2, z + Math.sin(an) * 0.035 * q); m.rotation.set(Math.sin(an) * 0.13, an, Math.cos(an) * 0.13); W.add(m); } };
       // حيطة الكنبة (الغربية): خلفية غامقة + شرايح جوز من الأرض للسقف — وآخر 66سم في الركن نجيلة وبينهم خط ليد دافي
       bx(xw, xw + 0.003, 0, H, zN, zS - 0.66, mBlk); slatsX(xw + 0.003, 1, zN + 0.01, 54, 0, H);
-      moss(xw, 1, 0.82, H, zS - 0.66, zS); bx(xw + 0.003, xw + 0.02, 0.82, H, zS - 0.685, zS - 0.667, mCyan);
+      moss(xw, 1, 0.10, H, zS - 0.66, zS); bx(xw + 0.003, xw + 0.02, 0.10, H, zS - 0.685, zS - 0.667, mCyan);   // قطعة واحدة من السقف لحد الوزرة
       { const zc = (s0 + s1) / 2; bx(xw + 0.025, xw + 0.05, 1.15, 2.10, zc - 0.33, zc + 0.33, mBlk); bx(xw + 0.05, xw + 0.054, 1.17, 2.08, zc - 0.31, zc + 0.31, art(3)); }
       // أباجورة قوس بقبة برتقاني فوق أول الكنبة
       { const lx = xw + 0.30, lz = s0 - 0.22, Rr = 0.45, g = new THREE.Group(); g.position.set(lx, 1.55, lz); g.rotation.y = -1.17; W.add(g);
@@ -1300,7 +1300,7 @@ const decor = new THREE.Group(); scene.add(decor);
       // حيطة التلفزيون (الشرقية): شرايح جنوب الشاشة فوق الميني بار وعليها 3 بوسترات — وشريط نجيلة طولي جنب الشرايح شمال الشاشة
       slatsX(xe - 0.003, -1, 7.12 * K, 7, 0.85, H);
       [[1.00, 0], [1.46, 1], [1.92, 2]].forEach(([y, k]) => { bx(xe - 0.045, xe - 0.025, y, y + 0.40, 7.145 * K, 7.445 * K, mBlk); bx(xe - 0.049, xe - 0.045, y + 0.018, y + 0.382, 7.163 * K, 7.427 * K, art(k)); });
-      moss(xe, -1, 0, H, 5.27 * K + 0.38, 5.27 * K + 0.59); bx(xe - 0.02, xe - 0.003, 0, H, 5.27 * K + 0.365, 5.27 * K + 0.378, mCyan);   // شريط نجيلة طولي (21سم) من الأرض للسقف جنب شرايح الخشب شمال الشاشة + خط ليد دافي بينهم
+      moss(xe, -1, 0.10, H, 5.27 * K + 0.38, 5.27 * K + 0.59); bx(xe - 0.02, xe - 0.003, 0.10, H, 5.27 * K + 0.365, 5.27 * K + 0.378, mCyan);   // شريط نجيلة طولي (21سم) من الأرض للسقف جنب شرايح الخشب شمال الشاشة + خط ليد دافي بينهم
       // عمود نور دافي واقف قدام الشرايح شمال الوحدة
       { const px = xe - 0.15, pz = 5.27 * K + 0.25; cy(px, 0.05, pz, 0.075, 0.1, mBlk); bx(px - 0.012, px + 0.012, 0.1, 1.62, pz - 0.012, pz + 0.012, mBlk); bx(px + 0.012, px + 0.016, 0.14, 1.60, pz - 0.009, pz + 0.009, mOrL);
         const L = new THREE.PointLight(0xff9450, 0.9, 3.2, 1.8); L.position.set(px - 0.08, 1.0, pz); W.add(L); }
