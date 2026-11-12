@@ -1448,12 +1448,21 @@ const decor = new THREE.Group(); scene.add(decor);
         cy(a + 0.18, 0.99, r.z1 - 0.09, 0.04, 0.2, mTerra, W, 'y', 0.055); cy(b - 0.2, 0.90, r.z1 - 0.09, 0.07, 0.025, mWht, W, 'y', 0.05); hit(a, b, r.z1 - 0.18, r.z1); }
     }
     // ---------- التراس ----------
-    { const r = E('terr'), tx = r.x1 - 0.85, tz = r.z0 + 0.6;
-      cy(tx, 0.015, tz, 0.2, 0.03, mBlk); cy(tx, 0.36, tz, 0.02, 0.69, mBlk); cy(tx, 0.715, tz, 0.3, 0.03, mWht); cy(tx + 0.08, 0.77, tz - 0.05, 0.035, 0.08, mTerra); hit(tx - 0.3, tx + 0.3, tz - 0.3, tz + 0.3);
-      chair(tx - 0.57, tz, -Math.PI / 2, mOlive); chair(tx + 0.57, tz, Math.PI / 2, mOlive);
-      { const a = r.x0 + 0.2, b = r.x0 + 1.9, z0 = r.z1 - 0.26, z1 = r.z1 - 0.06; bx(a, b, 0, 0.3, z0, z1, mPot); bx(a + 0.02, b - 0.02, 0.3, 0.31, z0 + 0.02, z1 - 0.02, mBrown);
-        for (let i = 0; i < 14; i++) { const x = a + 0.1 + i * (b - a - 0.2) / 13; cushion(x, 0.38 + (i % 3) * 0.05, (z0 + z1) / 2 + Math.sin(i * 2.1) * 0.04, 0.09, 0.05, 0.07, i % 2 ? mLeaf : mLeaf2); if (i % 3 === 1) ball(x, 0.5, (z0 + z1) / 2, 0.03, i % 2 ? mRed : mYel); } }
-      bx(r.x0 + 0.03, r.x0 + 0.34, 1.09, 1.64, r.z0 + 0.24, r.z0 + 0.92, mWht); cy(r.x0 + 0.345, 1.365, r.z0 + 0.5, 0.2, 0.012, mSteel2, W, 'x'); cy(r.x0 + 0.352, 1.365, r.z0 + 0.5, 0.17, 0.006, mBlk, W, 'x');   // الوحدة الخارجية للتكييف (آخر التراس غرب — من الرسمة)
+    { const r = E('terr'), mOak = S({ color: 0xc9a67b, roughness: 0.7 }), mOakD = S({ color: 0xa98356, roughness: 0.75 }), ex = r.x1, zn = r.z0, zs = r.z1;
+      // على الـ reference: حيطة شرايح خشب في آخر التراس + كنبة حرف L مبنية بمراتب وخدديات + رفّين بليد وزرع وفوانيس + ترابيزة مدورة + مشاية جوت
+      bx(ex - 0.03, ex, 0, 2.5, zn, zs, mOakD); for (let i = 0; i < 22; i++) bx(ex - 0.055, ex - 0.03, 0, 2.5, zn + 0.025 + i * 0.05, zn + 0.055 + i * 0.05, mOak);
+      bx(ex - 0.62, ex - 0.055, 0.07, 0.40, zn, zs - 0.12, mOak); bx(ex - 1.55, ex - 0.62, 0.07, 0.40, zn, zn + 0.5, mOak);
+      bx(ex - 0.61, ex - 0.07, 0.40, 0.50, zn + 0.02, zs - 0.14, mCream); bx(ex - 1.53, ex - 0.63, 0.40, 0.50, zn + 0.02, zn + 0.48, mCream);
+      bx(ex - 0.625, ex - 0.62, 0.03, 0.06, zn + 0.5, zs - 0.12, mWarm); bx(ex - 1.55, ex - 0.62, 0.03, 0.06, zn + 0.5, zn + 0.505, mWarm);
+      cushion(ex - 0.16, 0.66, zn + 0.75, 0.07, 0.15, 0.17, mOlive); cushion(ex - 0.16, 0.66, zn + 0.4, 0.07, 0.15, 0.17, mCream); cushion(ex - 0.45, 0.66, zn + 0.1, 0.17, 0.15, 0.07, mSofa2); cushion(ex - 0.95, 0.66, zn + 0.1, 0.17, 0.15, 0.07, mOlive); cushion(ex - 1.35, 0.66, zn + 0.1, 0.15, 0.14, 0.07, mCream);
+      hit(ex - 0.62, ex, zn, zs - 0.12); hit(ex - 1.55, ex - 0.62, zn, zn + 0.5);
+      for (const y of [1.35, 1.85]) { bx(ex - 0.24, ex - 0.055, y, y + 0.03, zn + 0.08, zs - 0.14, mOak); bx(ex - 0.235, ex - 0.225, y - 0.008, y, zn + 0.1, zs - 0.16, mWarm); }
+      [[1.38, zn + 0.2, 1], [1.38, zn + 0.9, 0], [1.88, zn + 0.3, 0], [1.88, zn + 0.75, 1]].forEach(([y, z, lan]) => { if (lan) { bx(ex - 0.2, ex - 0.1, y, y + 0.16, z - 0.05, z + 0.05, mBlk); bx(ex - 0.185, ex - 0.115, y + 0.02, y + 0.13, z - 0.035, z + 0.035, mWarm); }
+        else { cy(ex - 0.15, y + 0.05, z, 0.05, 0.1, mPot, W, 'y', 0.04); for (let i = 0; i < 10; i++) { const t = i / 9; cushion(ex - 0.15 - t * 0.05 + Math.cos(i * 2.1) * 0.04, y + 0.14 - t * t * 0.55, z + Math.sin(i * 2.1) * 0.05, 0.03, 0.012, 0.045, i % 2 ? mLeaf : mLeaf2); } } });
+      bx(ex - 0.075, ex - 0.055, 0.85, 1.25, zn + 0.42, zn + 0.72, mCream); bx(ex - 0.08, ex - 0.055, 0.83, 1.27, zn + 0.40, zn + 0.42, mBlk); bx(ex - 0.08, ex - 0.055, 0.83, 1.27, zn + 0.72, zn + 0.74, mBlk);
+      { const tx = ex - 1.0, tz = zn + 0.82; cy(tx, 0.46, tz, 0.22, 0.03, mOak); for (let i = 0; i < 3; i++) cy(tx + Math.cos(i * 2.1) * 0.16, 0.225, tz + Math.sin(i * 2.1) * 0.16, 0.01, 0.45, mBlk); bx(tx - 0.05, tx + 0.05, 0.475, 0.63, tz - 0.05, tz + 0.05, mBlk); bx(tx - 0.035, tx + 0.035, 0.49, 0.6, tz - 0.035, tz + 0.035, mWarm); cy(tx + 0.12, 0.51, tz + 0.08, 0.035, 0.07, mPot); }
+      { const a = r.x0 + 0.2, b = ex - 0.7, z0 = zs - 0.26, z1 = zs - 0.06; bx(a, b, 0, 0.3, z0, z1, mPot); bx(a + 0.02, b - 0.02, 0.3, 0.31, z0 + 0.02, z1 - 0.02, mBrown); bx(a, b, 0.985, 1.0, zs - 0.07, zs - 0.055, mWarm);
+        for (let i = 0; i < 22; i++) { const x = a + 0.1 + i * (b - a - 0.2) / 21; cushion(x, 0.38 + (i % 3) * 0.05, (z0 + z1) / 2 + Math.sin(i * 2.1) * 0.04, 0.09, 0.05, 0.07, i % 2 ? mLeaf : mLeaf2); if (i % 3 === 1) ball(x, 0.5, (z0 + z1) / 2, 0.025, mWht); } }
     }
     // ---------- الريسبشن ----------
     { const r = E('rec'), tx = r.x0 + 1.75, tz = r.z0 + 1.45, ex = r.x1 - 0.05, sz0 = r.z1 - 2.85, sz1 = r.z1 - 0.45, tvz = r.z1 - 1.07;
@@ -1536,7 +1545,7 @@ const decor = new THREE.Group(); scene.add(decor);
     // ---------- التراس: حبل لمبات دافية + سجادة خارجية ----------
     { const r = E('terr'), n = 12; cy((r.x0 + r.x1) / 2, 2.5, r.z1 - 0.1, 0.004, r.x1 - r.x0 - 0.2, mBlk, W, 'x');
       for (let i = 0; i < n; i++) { const x = r.x0 + 0.25 + i * (r.x1 - r.x0 - 0.5) / (n - 1); cy(x, 2.46, r.z1 - 0.1, 0.003, 0.08, mBlk); ball(x, 2.40, r.z1 - 0.1, 0.03, mWarm); }
-      bx(r.x1 - 1.75, r.x1 - 0.05, 0.002, 0.012, r.z0 + 0.12, r.z0 + 1.08, mJute); }
+      bx(r.x0 + 0.25, r.x1 - 1.65, 0.002, 0.012, r.z0 + 0.18, r.z0 + 0.82, mJute); }
     // ---------- إضافات بعد المقاسات الحقيقية ----------
     { // المطبخ: بار فطار على الحيطة الجنوبية + كرسيين + رف مجات + سقف جبس بسبوتات
       const r = E('kit'), a = r.x0 + 1.10, b = a + 1.2, z = r.z1;   // البار متزحزح 35سم بعيد عن الغسالة
