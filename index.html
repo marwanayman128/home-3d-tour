@@ -1194,8 +1194,8 @@ const decor = new THREE.Group(); scene.add(decor);
     cy(r.x0 + 0.22, 0.99, bz - 0.45, 0.07, 0.28, mBlk, W, 'y', 0.05); cy(r.x0 + 0.22, 0.93, bz + 0.45, 0.09, 0.16, mTerra, W, 'y', 0.06);
     { const fz = [[-0.55, -0.05], [0.05, 0.55]]; for (const [a, b] of fz) { bx(r.x0, r.x0 + 0.02, 1.25, 1.95, bz + a, bz + b, mBlk); bx(r.x0 + 0.02, r.x0 + 0.024, 1.28, 1.92, bz + a + 0.03, bz + b - 0.03, mCream); } }
     hit(r.x0, r.x0 + 0.45, bz - 0.65, bz + 0.65);
-    // ركنة L وشها للتلفزيون (الحيطة الغربية) — عايمة: العين على 3.2م من شاشة الـ65 بوصة — الضلع القصير ناحية السفرة عشان باب التراس يفضل مفتوح، ووراها ممشى 1.3م من باب الشقة للتراس
-    const ex = r.x0 + 3.70, sz1 = r.z1 - 0.35, sz0 = sz1 - 2.4, sm = (sz0 + sz1) / 2;
+    // ركنة L وشها للتلفزيون (الحيطة الغربية) — عايمة: العين على 2.85م من شاشة الـ65 بوصة — الضلع القصير ناحية السفرة عشان باب التراس يفضل مفتوح، ووراها ممشى 1.65م من باب الشقة للتراس
+    const ex = r.x0 + 3.35, sz1 = r.z1 - 0.35, sz0 = sz1 - 2.4, sm = (sz0 + sz1) / 2;
     bx(ex - 0.95, ex, 0.10, 0.40, sz0, sz1, mSofa); bx(ex - 0.22, ex, 0.40, 0.84, sz0, sz1, mSofa2); bx(ex - 0.95, ex, 0.40, 0.62, sz1 - 0.2, sz1, mSofa2);
     bx(ex - 2.05, ex - 0.95, 0.10, 0.40, sz0, sz0 + 0.9, mSofa); bx(ex - 2.05, ex, 0.40, 0.84, sz0 - 0.2, sz0 + 0.02, mSofa2);
     for (let i = 0; i < 3; i++) bx(ex - 0.93, ex - 0.24, 0.40, 0.50, sz1 - 0.92 - i * 0.72, sz1 - 0.22 - i * 0.72, mCream); bx(ex - 2.03, ex - 0.95, 0.40, 0.50, sz0 + 0.04, sz0 + 0.88, mCream);
@@ -1211,8 +1211,8 @@ const decor = new THREE.Group(); scene.add(decor);
     bx(r.x0, r.x0 + 0.42, 0.25, 0.58, tvz - 0.80, tvz + 0.78, mWal); bx(r.x0 + 0.42, r.x0 + 0.424, 0.41, 0.42, tvz - 0.75, tvz + 0.73, mBlk); bx(r.x0 + 0.06, r.x0 + 0.08, 0.236, 0.25, tvz - 0.75, tvz + 0.73, new THREE.MeshBasicMaterial({ color: 0xffe2a8 }));
     hit(r.x0, r.x0 + 0.42, tvz - 0.80, tvz + 0.78);
     { const _n = scene.children.length; plate('E', R.rec.x0, D.mouth.b + 0.13, 1.19, 'sw', 2); plate('E', R.rec.x0, D.mouth.b + 0.13, 1.31, 'sw', 2); NEWFIX.push(...scene.children.slice(_n)); }
-    { const cx = ex - 1.75, cz = sz0 + 1.65; cy(cx, 0.37, cz, 0.42, 0.04, mWal); for (let i = 0; i < 3; i++) cy(cx + Math.cos(i * 2.1) * 0.28, 0.175, cz + Math.sin(i * 2.1) * 0.28, 0.015, 0.35, mBlk); cy(cx + 0.1, 0.43, cz, 0.05, 0.08, mPot); hit(cx - 0.4, cx + 0.4, cz - 0.4, cz + 0.4); }
-    bx(ex - 2.75, ex - 0.5, 0.002, 0.014, sz0 + 0.05, sz1 - 0.1, mJute);
+    { const cx = ex - 1.70, cz = sz0 + 1.65; cy(cx, 0.37, cz, 0.42, 0.04, mWal); for (let i = 0; i < 3; i++) cy(cx + Math.cos(i * 2.1) * 0.28, 0.175, cz + Math.sin(i * 2.1) * 0.28, 0.015, 0.35, mBlk); cy(cx + 0.1, 0.43, cz, 0.05, 0.08, mPot); hit(cx - 0.4, cx + 0.4, cz - 0.4, cz + 0.4); }
+    bx(ex - 2.55, ex - 0.5, 0.002, 0.014, sz0 + 0.05, sz1 - 0.1, mJute);
     // مراية بالطول 60×180 على الحيطة الشرقية بين لوحة الكهرباء والتلفزيون
     { const mz = r.z0 + 2.72; bx(r.x1 - 0.022, r.x1, 0.14, 1.98, mz - 0.32, mz + 0.32, mBlk); bx(r.x1 - 0.026, r.x1 - 0.022, 0.16, 1.96, mz - 0.30, mz + 0.30, mMirror); }
     // ستارة مخفية: بيت ستارة جبس بطول الحيطة الجنوبية + بلاك أوت مجمّع على الجنبين + شيفون
@@ -1451,7 +1451,7 @@ const decor = new THREE.Group(); scene.add(decor);
       bx(r.x0 + 0.03, r.x0 + 0.34, 1.09, 1.64, r.z0 + 0.24, r.z0 + 0.92, mWht); cy(r.x0 + 0.345, 1.365, r.z0 + 0.5, 0.2, 0.012, mSteel2, W, 'x'); cy(r.x0 + 0.352, 1.365, r.z0 + 0.5, 0.17, 0.006, mBlk, W, 'x');   // الوحدة الخارجية للتكييف (آخر التراس غرب — من الرسمة)
     }
     // ---------- الريسبشن ----------
-    { const r = E('rec'), tx = r.x0 + 1.75, tz = r.z0 + 1.45, ex = r.x0 + 3.70, sz1 = r.z1 - 0.35, sz0 = sz1 - 2.4, tvz = r.z1 - 1.07;
+    { const r = E('rec'), tx = r.x0 + 1.75, tz = r.z0 + 1.45, ex = r.x0 + 3.35, sz1 = r.z1 - 0.35, sz0 = sz1 - 2.4, tvz = r.z1 - 1.07;
       // ساوند بار + كتب وفازة على وحدة التلفزيون
       bx(r.x0 + 0.10, r.x0 + 0.18, 0.58, 0.65, tvz - 0.45, tvz + 0.45, mBlk);
       [mOlive, mCream, mTerra].forEach((m, i) => bx(r.x0 + 0.12, r.x0 + 0.34 - i * 0.01, 0.58 + i * 0.03, 0.61 + i * 0.03, tvz + 0.5 + i * 0.01, tvz + 0.74 - i * 0.01, m));
@@ -1488,7 +1488,7 @@ const decor = new THREE.Group(); scene.add(decor);
     // ---------- بسطة السلم: دواسة + زرعة جنب باب الشقة ----------
     { const a = D.entrance.a * K, b = D.entrance.b * K; bx(a + 0.15, b - 0.15, 0.002, 0.014, -0.78, -0.3, mBrown); plant(a - 0.32, -0.5, 1.0); }
     // ---------- السفرة والترابيزة والجزامة: إكسسوارات ----------
-    { const r = E('rec'), tx = r.x0 + 1.75, tz = r.z0 + 1.45, cx = r.x0 + 3.70 - 1.75, cz = r.z1 - 2.75 + 1.65;
+    { const r = E('rec'), tx = r.x0 + 1.75, tz = r.z0 + 1.45, cx = r.x0 + 3.35 - 1.70, cz = r.z1 - 2.75 + 1.65;
       bx(tx - 0.8, tx + 0.8, 0.75, 0.753, tz - 0.14, tz + 0.14, mCream); for (const dx of [-0.5, 0, 0.5]) for (const s of [-1, 1]) { cy(tx + dx, 0.757, tz + s * 0.3, 0.11, 0.008, mWht); cy(tx + dx, 0.763, tz + s * 0.3, 0.075, 0.006, mStone); }
       bx(cx - 0.3, cx - 0.04, 0.39, 0.40, cz - 0.13, cz + 0.13, mBlk); bx(cx - 0.27, cx - 0.09, 0.40, 0.425, cz - 0.1, cz + 0.04, mOlive); bx(cx - 0.05, cx + 0.0, 0.39, 0.405, cz + 0.2, cz + 0.36, mBlk);
       cy(r.x1 - 2.78, 1.035, r.z0 + 0.12, 0.07, 0.03, mBlk, W, 'y', 0.045); }
@@ -1531,7 +1531,7 @@ const decor = new THREE.Group(); scene.add(decor);
       bx(r.x1 - 1.75, r.x1 - 0.05, 0.002, 0.012, r.z0 + 0.12, r.z0 + 1.08, mJute); }
     // ---------- إضافات بعد المقاسات الحقيقية ----------
     { // الريسبشن: كونسول رفيع ورا ضهر الركنة (ناحية الممشى) + أباجورة وكتب وزرعة وسلتين
-      const r = E('rec'), ex = r.x0 + 3.70, sz0 = r.z1 - 2.75, a = sz0 + 0.4, b = sz0 + 2.0, cx = ex + 0.16;
+      const r = E('rec'), ex = r.x0 + 3.35, sz0 = r.z1 - 2.75, a = sz0 + 0.4, b = sz0 + 2.0, cx = ex + 0.16;
       bx(ex + 0.02, ex + 0.30, 0.72, 0.76, a, b, mWal); for (const z of [a + 0.03, b - 0.07]) for (const x of [ex + 0.03, ex + 0.26]) bx(x, x + 0.03, 0, 0.72, z, z + 0.04, mBlk); bx(ex + 0.04, ex + 0.28, 0.2, 0.22, a + 0.05, b - 0.05, mWal);
       cy(cx, 0.80, a + 0.25, 0.07, 0.08, mBlk); cy(cx, 0.93, a + 0.25, 0.012, 0.2, mBlk); cy(cx, 1.1, a + 0.25, 0.11, 0.2, mCream, W, 'y', 0.15); cy(cx, 1.0, a + 0.25, 0.09, 0.01, mWarm);
       [mOlive, mTerra, mCream].forEach((m, i) => bx(ex + 0.07, ex + 0.26, 0.76 + i * 0.03, 0.79 + i * 0.03, b - 0.55 + i * 0.01, b - 0.3 - i * 0.01, m));
