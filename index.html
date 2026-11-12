@@ -1223,11 +1223,10 @@ const decor = new THREE.Group(); scene.add(decor);
     // مراية بالطول 60×180 على الحيطة الشرقية بين لوحة الكهرباء والتلفزيون
     { const mz = r.z0 + 2.72; bx(r.x1 - 0.022, r.x1, 0.14, 1.98, mz - 0.32, mz + 0.32, mBlk); bx(r.x1 - 0.026, r.x1 - 0.022, 0.16, 1.96, mz - 0.30, mz + 0.30, mMirror); }
     // ستارة مخفية: بيت ستارة جبس بطول الحيطة الجنوبية + بلاك أوت مجمّع على الجنبين + شيفون
-    { const zs = r.z1, dA = D.terrace.a * K, dB = D.terrace.b * K, wA = WIN.rec.a * K, CH = 2.30;   // CH = ارتفاع الستارة: تحت التكييف عشان متقفلش عليه
+    { const zs = r.z1, dA = D.terrace.a * K, dB = D.terrace.b * K, wA = WIN.rec.a * K, CH = H - 0.03;   // الستارة مخفية نازلة من السقف جوه مجرى الجبس
       const mBO = S({ color: 0x8b8072, roughness: 1, side: THREE.DoubleSide }), mShr = S({ color: 0xffffff, roughness: 1, transparent: true, opacity: 0.45, depthWrite: false, side: THREE.DoubleSide });
       const pleat = (x0, x1, z, mat, rad) => { for (let x = x0 + rad; x < x1; x += rad * 1.7) { const c = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad, CH - 0.02, 8, 1, true), mat); c.position.set(x, (CH - 0.02) / 2 + 0.02, z + Math.sin(x * 23) * 0.012); c.scale.z = 0.6; W.add(c); } };
       bx(r.x0, r.x1, H - 0.16, H, zs - 0.30, zs - 0.26, mWht);
-      bx(r.x0, r.x1, CH - 0.06, CH + 0.06, zs - 0.25, zs - 0.23, mWht); bx(r.x0, r.x1, CH + 0.04, CH + 0.06, zs - 0.25, zs, mWht);   // بيت الستارة على 230سم بعرض الحيطة — التكييف فوقه
       pleat(dA - 0.62, dA - 0.04, zs - 0.17, mBO, 0.055); pleat(dB + 0.04, dB + 0.62, zs - 0.17, mBO, 0.055); pleat(wA - 0.62, wA - 0.04, zs - 0.17, mBO, 0.055);
       pleat(dA - 0.30, dA + 0.02, zs - 0.10, mShr, 0.05); pleat(dB - 0.02, dB + 0.30, zs - 0.10, mShr, 0.05); pleat(wA - 0.10, r.x1 - 0.02, zs - 0.10, mShr, 0.05); }
     plant(r.x0 + 0.38, r.z0 + 0.38, 1.35); plant(r.x1 - 2.98, r.z1 - 0.38, 1.3);   // جنب باب التراس وبعيد عن خط الرؤية بين الركنة والتلفزيون
@@ -1475,7 +1474,7 @@ const decor = new THREE.Group(); scene.add(decor);
     { const mSl = S({ color: 0x5a5d61, roughness: 0.8 });
       const acS = (xc, y, z) => { bx(xc - 0.4, xc + 0.4, y, y + 0.28, z - 0.2, z, mWht); bx(xc - 0.37, xc + 0.37, y + 0.012, y + 0.04, z - 0.203, z - 0.2, mSl); bx(xc - 0.36, xc - 0.28, y + 0.2, y + 0.23, z - 0.202, z - 0.2, mSl); };
       acS((WIN.bed.a + WIN.bed.b) / 2 * K, 2.2, E('bed').z1); acS((WIN.office.a + WIN.office.b) / 2 * K, 2.2, E('office').z1);   // فوق الشباك في الأطفال والجيمنج
-      { const xc = (D.terrace.a + D.terrace.b) / 2 * K, z = R.rec.z1 * K; bx(xc - 0.55, xc + 0.55, 2.38, 2.66, z - 0.22, z, mWht); bx(xc - 0.52, xc + 0.52, 2.392, 2.42, z - 0.223, z - 0.22, mSl); bx(xc - 0.5, xc - 0.42, 2.58, 2.61, z - 0.222, z - 0.22, mSl); }   // 3 حصان (110سم) تحت السقف على طول — فوق بيت الستارة                                                                                             // الريسبشن: فوق باب التراس (الوحدة الخارجية على كتايف آخر التراس ناحية الغرب)
+      // الريسبشن: من غير تكييف حيطة (كان مبوّظ الستارة المخفية)
       { const z = E('master').z1, xc = 3.05, y = 2.15;                       // الماستر: على حيطة الشباك (حامل الوحدة الخارجية وراها) — شرق الستارة
         bx(xc - 0.4, xc + 0.4, y, y + 0.28, z - 0.2, z, mWht); bx(xc - 0.37, xc + 0.37, y + 0.012, y + 0.04, z - 0.203, z - 0.2, mSl); bx(xc - 0.36, xc - 0.28, y + 0.2, y + 0.23, z - 0.202, z - 0.2, mSl); } }
     // ---------- أباجورات سقف حوالين اللمبات ----------
