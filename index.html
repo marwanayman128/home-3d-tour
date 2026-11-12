@@ -1316,8 +1316,8 @@ const decor = new THREE.Group(); scene.add(decor);
     { const w0 = r.z0 + 0.14, w1 = w0 + 0.88, wm = (w0 + w1) / 2;        // الدولاب في الركن على الحيطة الغربية: بعد البروز وقبل الفيشتين، وضلفه بتفتح على فراغ
       bx(r.x0, r.x0 + 0.55, 0.06, 2.0, w0, w1, mWht); bx(r.x0 + 0.04, r.x0 + 0.5, 0, 0.06, w0 + 0.04, w1 - 0.04, mBlk); bx(r.x0 + 0.55, r.x0 + 0.553, 0.08, 1.98, wm - 0.004, wm + 0.004, mBlk);
       for (const dz of [-0.06, 0.045]) bx(r.x0 + 0.55, r.x0 + 0.57, 0.9, 1.2, wm + dz, wm + dz + 0.015, mWal); hit(r.x0, r.x0 + 0.55, w0, w1);
-      // وحدة تخزين واطية بسلال ملونة على الحيطة الشمالية تحت الخريطة والتكييف
-      const c0 = r.x0 + 0.5, c1 = c0 + 0.9; bx(c0, c1, 0, 0.75, r.z0, r.z0 + 0.32, mWht); [mBlue, mYel, mRed, mOlive, mTerra, mBlue].forEach((m, i) => bx(c0 + 0.03 + (i % 3) * 0.29, c0 + 0.29 + (i % 3) * 0.29, 0.05 + (i > 2 ? 0.36 : 0), 0.36 + (i > 2 ? 0.36 : 0), r.z0 + 0.32, r.z0 + 0.33, m)); hit(c0, c1, r.z0, r.z0 + 0.32); }
+      // وحدة السلال الملونة على الحيطة الغربية تحت رف الكتب (مكان صندوق اللعب) — قدام الدولاب فاضي عشان الضلف تفتح
+      const k0 = r.z0 + 2.1; bx(r.x0, r.x0 + 0.32, 0, 0.75, k0, k0 + 0.9, mWht); [mBlue, mYel, mRed, mOlive, mTerra, mBlue].forEach((m, i) => bx(r.x0 + 0.32, r.x0 + 0.33, 0.05 + (i > 2 ? 0.36 : 0), 0.36 + (i > 2 ? 0.36 : 0), k0 + 0.03 + (i % 3) * 0.29, k0 + 0.29 + (i % 3) * 0.29, m)); hit(r.x0, r.x0 + 0.32, k0, k0 + 0.9); }
     const bw = 0.98, x0 = r.x1 - bw, b1 = r.z1 - 0.30, b0 = b1 - 2.0;   // السرير بيخلص قبل بروز الركن الجنوبي الشرقي
     for (const [a, b] of [[x0, b0], [r.x1 - 0.06, b0], [x0, b1 - 0.06], [r.x1 - 0.06, b1 - 0.06]]) bx(a, a + 0.06, 0, 1.78, b, b + 0.06, mWal);
     for (const [yb, col] of [[0.25, mBlue], [1.22, mYel]]) { bx(x0, r.x1, yb, yb + 0.08, b0, b1, mWal); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.08, yb + 0.22, b0 + 0.06, b1 - 0.06, mWht); bx(x0 + 0.05, r.x1 - 0.05, yb + 0.22, yb + 0.27, b0 + 0.6, b1 - 0.06, col); cushion(x0 + bw / 2, yb + 0.29, b0 + 0.3, 0.3, 0.06, 0.17, mWht); }
@@ -1329,7 +1329,6 @@ const decor = new THREE.Group(); scene.add(decor);
     chair(dx0 + 0.35, r.z1 - 0.72, Math.PI, mBlue); cy(dx0 + 0.15, 0.76, r.z1 - 0.15, 0.06, 0.02, mBlk); cy(dx0 + 0.15, 0.84, r.z1 - 0.15, 0.008, 0.16, mBlk); cy(dx0 + 0.15, 0.945, r.z1 - 0.2, 0.07, 0.07, mYel, W, 'y', 0.04);
     hit(dx0, dx1, r.z1 - 0.5, r.z1);
     cy(r.x0 + 1.3, 0.008, r.z0 + 2.0, 0.6, 0.014, mBlue); cy(r.x0 + 1.3, 0.012, r.z0 + 2.0, 0.42, 0.014, mCream);
-    bx(r.x0, r.x0 + 0.42, 0, 0.4, r.z0 + 2.2, r.z0 + 2.8, mYel); bx(r.x0, r.x0 + 0.43, 0.4, 0.44, r.z0 + 2.19, r.z0 + 2.81, mWal); hit(r.x0, r.x0 + 0.43, r.z0 + 2.2, r.z0 + 2.8);
     bx(r.x0, r.x0 + 0.2, 1.35, 1.38, r.z0 + 2.0, r.z0 + 3.0, mWal); for (let i = 0; i < 7; i++) bx(r.x0 + 0.03, r.x0 + 0.17, 1.38, 1.56 + (i % 3) * 0.03, r.z0 + 2.06 + i * 0.07, r.z0 + 2.11 + i * 0.07, [mBlue, mYel, mRed, mOlive][i % 4]);
   }
   // =================== المطبخ ===================
@@ -1401,7 +1400,7 @@ const decor = new THREE.Group(); scene.add(decor);
       // حبل أعلام ملونة على الحيطة الغربية
       { const za = r.z0 + 2.0, zb = r.z1 - 0.3, n = 11, cols = [mRed, mYel, mBlue, mOlive, mTerra]; bx(xw + 0.004, xw + 0.008, 2.232, 2.238, za, zb, mBlk);
         for (let i = 0; i < n; i++) { const f = new THREE.Mesh(new THREE.CircleGeometry(0.085, 3), cols[i % 5]); f.rotation.set(0, Math.PI / 2, -Math.PI / 2); f.position.set(xw + 0.012, 2.19, za + 0.1 + i * (zb - za - 0.2) / (n - 1)); W.add(f); } }
-      // خريطة العالم على الحيطة الشمالية (فوق وحدة التخزين وتحت التكييف)
+      // خريطة العالم على الحيطة الشمالية
       { const a = r.x0 + 0.5, b = a + 0.85, z = r.z0; bx(a, b, 1.15, 1.72, z, z + 0.02, mWht); bx(a + 0.03, b - 0.03, 1.18, 1.69, z + 0.02, z + 0.024, mBlue);
         for (const [dy, dx, sy, sx] of [[1.52, 0.2, 0.09, 0.08], [1.36, 0.25, 0.07, 0.045], [1.5, 0.45, 0.06, 0.07], [1.36, 0.47, 0.08, 0.05], [1.52, 0.64, 0.08, 0.1], [1.3, 0.7, 0.035, 0.05]]) cushion(a + dx, dy, z + 0.025, sx, sy, 0.003, mLeaf2); }
       // مكعبات على الأرض + دبدوب على السرير التحتاني
@@ -1594,11 +1593,11 @@ const decor = new THREE.Group(); scene.add(decor);
         for (const dz of [-0.38, 0.3]) { cy(x0 + 0.19, 0.16, sm + dz, 0.15, 0.3, mJute, W, 'y', 0.13); cy(x0 + 0.19, 0.31, sm + dz, 0.155, 0.02, mWal); }
         hit(x0, r.x1, sm - 0.75, sm + 0.75); }
       // أوضة الأطفال: موبايل طيارات ورق من السقف + أباجورة قمر وعربية لعبة فوق وحدة التخزين + مقلمة على المكتب
-      { const r = E('bed'), c0 = r.x0 + 0.5, dx0 = r.x0 + 0.76, mx = r.x0 + 0.95, mz = r.z0 + 2.45;
+      { const r = E('bed'), k0 = r.z0 + 2.1, dx0 = r.x0 + 0.76, mx = r.x0 + 0.95, mz = r.z0 + 2.45;
         [[0, 0, 2.28, mRed, 0.4], [0.22, 0.14, 2.14, mBlue, 2.2], [-0.16, 0.2, 2.2, mYel, 4.1], [0.08, -0.2, 2.06, mOlive, 5.3]].forEach(([dx, dz, y, m, ry]) => { bx(mx + dx - 0.002, mx + dx + 0.002, y, H, mz + dz - 0.002, mz + dz + 0.002, mWht);
           const pl = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.2, 3), m); pl.rotation.set(0, ry, Math.PI / 2); pl.scale.x = 1; pl.scale.z = 0.3; pl.position.set(mx + dx, y, mz + dz); W.add(pl); });
-        cy(c0 + 0.72, 0.765, r.z0 + 0.16, 0.05, 0.03, mWal); ball(c0 + 0.72, 0.86, r.z0 + 0.16, 0.085, mGlow);
-        bx(c0 + 0.14, c0 + 0.34, 0.775, 0.82, r.z0 + 0.12, r.z0 + 0.21, mRed); bx(c0 + 0.19, c0 + 0.29, 0.82, 0.86, r.z0 + 0.125, r.z0 + 0.205, mBlue); for (const x of [c0 + 0.18, c0 + 0.30]) for (const z of [r.z0 + 0.12, r.z0 + 0.21]) cy(x, 0.775, z, 0.025, 0.02, mBlk, W, 'z');
+        cy(r.x0 + 0.16, 0.765, k0 + 0.72, 0.05, 0.03, mWal); ball(r.x0 + 0.16, 0.86, k0 + 0.72, 0.085, mGlow);
+        bx(r.x0 + 0.12, r.x0 + 0.21, 0.775, 0.82, k0 + 0.14, k0 + 0.34, mRed); bx(r.x0 + 0.125, r.x0 + 0.205, 0.82, 0.86, k0 + 0.19, k0 + 0.29, mBlue); for (const z of [k0 + 0.18, k0 + 0.30]) for (const x of [r.x0 + 0.12, r.x0 + 0.21]) cy(x, 0.775, z, 0.025, 0.02, mBlk, W, 'x');
         cy(dx0 + 0.32, 0.795, r.z1 - 0.1, 0.035, 0.09, mBlue); [mRed, mYel, mOlive].forEach((m, i) => { const pn = cy(dx0 + 0.31 + i * 0.012, 0.88, r.z1 - 0.1, 0.004, 0.13, m); pn.rotation.z = (i - 1) * 0.15; }); }
       // المطبخ: نجفتين صغيرين فوق بار الفطار + سبورة منيو على الحيطة جنبه
       { const r = E('kit'), z = r.z1, GK = 2.55;
